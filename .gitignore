@@ -3,3 +3,6 @@
 !*.c
 !.myfuncs
 !new.txt
+!*.h
+!*.mak
+!*.makefile
