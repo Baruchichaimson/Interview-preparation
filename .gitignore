@@ -1,8 +1,11 @@
+*
 
+!**/
 !.gitignore
-!*.c
 !.myfuncs
+
+!**/*.c
 !new.txt
-!*.h
+!**/*.h
 !*.mak
-!*.makefile
+!**/makefile
