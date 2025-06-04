@@ -1,9 +1,14 @@
 #include <stdio.h>
+#include <ctype.h>
 
 void WhiteSpace(char* str)
 {
     char* final = str;
-    char* start = str;   
+    char* start = str;  
+    while (isspace((unsigned char)*str)) 
+    {
+        str++;
+    }
     while (*str)
     {
         if (*str == ' ' && *(str + 1) == ' ')
@@ -15,13 +20,17 @@ void WhiteSpace(char* str)
         final++;
         str++;
     }
+    if(str > final)
+    {
+    	final--;
+    }
     *final = '\0';
     printf("After : \"%s\"\n", start);  
 }
 
 int main()
 {
-    char str[] = "This   is   a   test   string";
+    char str[] = "  \t This   is   a   test   string   ";
     printf("Before: \"%s\"\n", str);
     WhiteSpace(str);
     
