@@ -5,6 +5,14 @@
 #include <stdio.h>
 #include <assert.h>
 
+/***************************
+ Exercise:  WS2
+ Date: 	    05/06/25
+ Developer: Baruch Haimson
+ Reviewer:  Tal Hindi
+ Status:    Approved
+***************************/
+
 size_t StrLen(const char* str);
 int StrCmp(const char *s1,const char *s2);
 char* StpCpy(char *dst, const char *src);

@@ -1,17 +1,20 @@
 #include <stdio.h>
+/**********
+ Exercise: 	WS2
+ Date: 		05/06/25
+ Developer:     Baruch Haimson
+ Reviewer: 	Tal Hindi
+ Status: 	Approved
+ **********/
 
-
-int contains_digit(int number, int digit)
+int contains_digit(int number)
 {
-    if (digit < 0 || digit > 9)
-        return 0; 
-
     if (number < 0)
         number = -number; 
 
     while (number > 0)
     {
-        if (number % 10 == digit)
+        if (number % 10 == 7)
             return 1;
         number /= 10;
     }
@@ -22,13 +25,13 @@ void BOOM(int start, int end)
 {
 	while(start < end)
 	{
-		if(start % 7 != 0 || (!contains_digit(start, 7)))
+		if(start % 7 == 0 || contains_digit(start))
 		{
-			printf(" %d",start);
+			printf(" BOOM");
 		}
 		else
 		{
-			printf(" BOOM");
+			printf(" %d",start);
 		}
 		start++;
 	}
@@ -36,6 +39,6 @@ void BOOM(int start, int end)
 
 int main()
 {
-	BOOM(1,10);
+	BOOM(-13,17);
 	return 0;
 }

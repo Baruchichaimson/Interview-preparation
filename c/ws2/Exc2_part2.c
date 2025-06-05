@@ -1,7 +1,18 @@
 #include <stdio.h>
-
+/**********
+ Exercise: 	WS2
+ Date: 		05/06/25
+ Developer:     Baruch Haimson
+ Reviewer: 	Tal Hindi
+ Status: 	Approved
+ **********/
 int Palindrom(char* str, size_t size)
 {
+    if(str == NULL)
+    {
+        printf("not valid!!!\n");
+    	return 0;
+    }
     char* p = str;
     char* q = str + size - 1;
 

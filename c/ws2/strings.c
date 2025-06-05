@@ -2,10 +2,11 @@
 #include <stdlib.h>
 #include <assert.h>
 /***************************
-author:Baruch Haimson
-reviewer:
-status:approved
-
+ Exercise:  WS2
+ Date: 	    05/06/25
+ Developer: Baruch Haimson
+ Reviewer:  Tal Hindi
+ Status:    Approved
 ***************************/
 size_t StrLen(const char *str)
 {
@@ -231,7 +232,6 @@ char* StrTok(char *str, const char *delim)
         return NULL;    
     }
 
-    /* Skip leading delimiters */
     while (*next && is_in(delim, *next)) 
     {
         next++;
@@ -244,7 +244,6 @@ char* StrTok(char *str, const char *delim)
 
     start = next;
 
-    /* Find end of token */
     while (*next && !is_in(delim, *next)) 
     {
         next++;

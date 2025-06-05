@@ -1,5 +1,12 @@
 #include <stdio.h>
 #include <ctype.h>
+/**********
+ Exercise: 	WS2
+ Date: 		05/06/25
+ Developer:     Baruch Haimson
+ Reviewer: 	Tal Hindi
+ Status: 	Approved
+ **********/
 
 void WhiteSpace(char* str)
 {
