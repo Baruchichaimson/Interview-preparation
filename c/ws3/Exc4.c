@@ -55,7 +55,7 @@ void print_env(char **env)
 {
     for (char **p = env; *p; p++) 
     {
-        puts(*p);
+        printf("%s\n", *p);
     }
 }
 
