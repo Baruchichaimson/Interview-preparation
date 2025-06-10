@@ -4,19 +4,19 @@
 
 #define SIZE 100
 
-enum operations {CORRECT , ERROR};
+enum status {CORRECT , ERROR , EXIT};
 
 struct CommandHandler
 {
     char* keyword;
-    int (*match)(const char*);
-    enum operations (*action)(const char*, const char*);
+    int (*match)(char* keyword, const char* input);
+    enum status (*action)(const char*, const char*);
 };
 
 /***************************************
 actions functions
 ***************************************/
-enum operations action_add(const char* filename, const char* input) 
+enum status action_add(const char* filename, const char* input) 
 {
     FILE* f = fopen(filename, "a");
     if (!f) 
@@ -29,7 +29,7 @@ enum operations action_add(const char* filename, const char* input)
     fclose(f);
     return CORRECT;
 }
-enum operations action_remove(const char* filename, const char* input) 
+enum status action_remove(const char* filename, const char* input) 
 {
     if (remove(filename) == 0)
     {
@@ -43,7 +43,7 @@ enum operations action_remove(const char* filename, const char* input)
     }
 }
 
-enum operations action_count(const char* filename, const char* input) 
+enum status action_count(const char* filename, const char* input) 
 {
    int lines = 0;
    char line[SIZE];
@@ -64,16 +64,18 @@ enum operations action_count(const char* filename, const char* input)
    return CORRECT;
 }
 
-enum operations action_prefix(const char* filename, const char* input) 
+enum status action_prefix(const char* filename, const char* input) 
 {
     FILE* f = fopen(filename, "r");
     char existing_content[10000] = "";
     char line[SIZE];
     
-    if (f) {
-        while (fgets(line, sizeof(line), f) != NULL) {
+    if (f) 
+    {
+        while (fgets(line, sizeof(line), f) != NULL) 
+        {
             strcat(existing_content, line);
-        }
+    	}
         fclose(f);
     }
     
@@ -92,40 +94,39 @@ enum operations action_prefix(const char* filename, const char* input)
     return CORRECT;
 }
 
-enum operations action_exit() 
+enum status action_exit() 
 {
     printf("Exiting...\n");
-    exit(0);
-    return CORRECT;
+    return EXIT;
 }
 
 /***************************************
 matches functions
 ***************************************/
-int match_remove(const char* input) 
+int match_remove(char* keyword, const char* input) 
 {
-    return strcmp(input, "-remove") == 0;
+    return strcmp(input, keyword) == 0;
 }
 
-int match_count(const char* input) 
+int match_count(char* keyword ,const char* input) 
 {
-    return strcmp(input, "-count") == 0;
+    return strcmp(input, keyword) == 0;
 }
 
-int match_exit(const char* input) 
+int match_exit(char* keyword ,const char* input) 
 {
-    return strcmp(input, "-exit") == 0;
+    return strcmp(input, keyword) == 0;
 }
 
-int match_prefix(const char* input) 
+int match_prefix(char* keyword ,const char* input) 
 {
-    return input[0] == '<';
+    return strncmp(input, keyword, 1) == 0;
 }
-
 
 
 int main(int argc, char* argv[]) 
 { 
+    enum status result;	
     if (argc < 2) 
     {
     	fprintf(stderr, "Usage: %s <filename>\n", argv[0]);
@@ -135,16 +136,15 @@ int main(int argc, char* argv[])
     char buffer[SIZE];
     struct CommandHandler handlers[] = 
     {
-	{"-append", match_prefix, action_prefix},
+	{"<", match_prefix, action_prefix},
 	{"-remove", match_remove, action_remove},
 	{"-count", match_count, action_count},
 	{"-exit", match_exit, action_exit},
     };
     
-    printf("Logger running... Enter string:\n");
-
     while (1) 
     {
+    	printf("Logger running... Enter string:\n");
         fgets(buffer, sizeof(buffer), stdin);
 	buffer[strcspn(buffer, "\n")] = 0;
 
@@ -157,9 +157,9 @@ int main(int argc, char* argv[])
         int len = sizeof(handlers) / sizeof(handlers[0]);
         for (int i = 0; i < len; ++i) 
         {
-            if(handlers[i].match(buffer)) 
+            if(handlers[i].match(handlers[i].keyword , buffer)) 
             {
-        	enum operations result = handlers[i].action(filename, buffer);
+        	result = handlers[i].action(filename, buffer);
                 if (result == ERROR) 
                 {
         		fprintf(stderr, "Command failed: %s\n", buffer);
@@ -170,9 +170,18 @@ int main(int argc, char* argv[])
         }
         if (!handled) 
         {
-            action_add(filename, buffer);
+            result = action_add(filename, buffer);
         }
+	switch (result)
+	{
+		case ERROR:
+			fprintf(stderr, "Action failed. Please try again.\n");
+			break;
+		case EXIT:
+			exit(0);
+		case CORRECT:
+			break;
+	}
     }
-
     return 0;
 }
