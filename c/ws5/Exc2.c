@@ -4,23 +4,31 @@
 
 #define SIZE 100
 
-enum operations { ADD, REMOVE, COUNT , PREFIX, EXIT };
+enum operations {ADD, REMOVE, COUNT , PREFIX, EXIT};
 
-enum operations action_add(const char* filename, const char* input) 
+struct CommandHandler
+{
+    char* keyword;
+    int (*match)(const char*);
+    void (*action)(const char*, const char*);
+};
+
+/***************************************
+actions functions
+***************************************/
+void action_add(const char* filename, const char* input) 
 {
     FILE* f = fopen(filename, "a");
     if (!f) 
     {
-        perror("Error opening file");
-        return ADD;
+    	perror("Error opening file");
+    	return;
     }
 
     fprintf(f, "%s\n", input);
     fclose(f);
-    return ADD;
 }
-
-enum operations action_remove(const char* filename, const char* input) 
+void action_remove(const char* filename, const char* input) 
 {
     if (remove(filename) == 0)
     {
@@ -30,31 +38,29 @@ enum operations action_remove(const char* filename, const char* input)
     {
         perror("Failed to delete file");
     }
-    return REMOVE;
 }
 
-enum operations action_count(const char* filename, const char* input) 
+void action_count(const char* filename, const char* input) 
 {
-    int lines = 0;
-    char line[SIZE];
-    FILE* f = fopen(filename, "r");
-    if (!f) 
-    {
-        perror("Error opening file");
-        return COUNT;
-    }
+   int lines = 0;
+   char line[SIZE];
+   FILE* f = fopen(filename, "r");
+   if (!f) 
+   {
+    	perror("Error opening file");
+    	return;
+   }
+   
+   while (fgets(line, sizeof(line), f) != NULL) 
+   {
+       lines++;
+   } 
     
-    while (fgets(line, sizeof(line), f) != NULL) 
-    {
-        lines++;
-    } 
-    
-    fclose(f);
-    printf("Total lines in file: %d\n", lines);
-    return COUNT;
+   fclose(f);
+   printf("Total lines in file: %d\n", lines);
 }
 
-enum operations action_prefix(const char* filename, const char* input) 
+void action_prefix(const char* filename, const char* input) 
 {
     FILE* f = fopen(filename, "r");
     char existing_content[10000] = "";
@@ -70,81 +76,93 @@ enum operations action_prefix(const char* filename, const char* input)
     f = fopen(filename, "w");
     if (!f) {
         perror("Error opening file for writing");
-        return PREFIX;
+        return;
     }
     
     fprintf(f, "%s\n", input + 1); 
+    
     fprintf(f, "%s", existing_content);
     
     fclose(f);
     printf("Added prefix line: %s\n", input + 1);
-    return PREFIX;
 }
 
-enum operations action_exit() 
+void action_exit() 
 {
     printf("Exiting...\n");
-    exit(0);  
-    return EXIT;
+    exit(0);
 }
 
-enum operations detect_operation(const char* input)
+/***************************************
+matches functions
+***************************************/
+int match_remove(const char* input) 
 {
-    if (strcmp(input, "-remove") == 0)
-        return REMOVE;
-    if (strcmp(input, "-count") == 0)
-        return COUNT;
-    if (strcmp(input, "-exit") == 0)
-        return EXIT;
-    if (input[0] == '<')
-        return PREFIX;
-    return ADD;
+    return strcmp(input, "-remove") == 0;
 }
+
+int match_count(const char* input) 
+{
+    return strcmp(input, "-count") == 0;
+}
+
+int match_exit(const char* input) 
+{
+    return strcmp(input, "-exit") == 0;
+}
+
+int match_prefix(const char* input) 
+{
+    return input[0] == '<';
+}
+
+
 
 int main(int argc, char* argv[]) 
 { 
     if (argc < 2) 
     {
-        fprintf(stderr, "Usage: %s <filename>\n", argv[0]);
-        return 1;
+    	fprintf(stderr, "Usage: %s <filename>\n", argv[0]);
+    	return 1;
     }
-
     const char* filename = argv[1];
     char buffer[SIZE];
-
-    printf("Logger running. Enter lines (empty to quit):\n");
+    struct CommandHandler handlers[] = 
+    {
+	{"-append", match_prefix, action_prefix},
+	{"-remove", match_remove, action_remove},
+	{"-count", match_count, action_count},
+	{"-exit", match_exit, action_exit},
+    };
+    
+    printf("Logger running. Enter string:\n");
 
     while (1) 
     {
         fgets(buffer, sizeof(buffer), stdin);
-        buffer[strcspn(buffer, "\n")] = 0;
+	buffer[strcspn(buffer, "\n")] = 0;
 
         if (strlen(buffer) == 0)
-            break;
+        { 
+        	break;
+        }
 
-        enum operations op = detect_operation(buffer);
-        enum operations result;
-
-        switch (op)
+        int handled = 0;
+        int len = sizeof(handlers) / sizeof(handlers[0]);
+        for (int i = 0; i < len; ++i) 
         {
-            case PREFIX:
-                result = action_prefix(filename, buffer);
+            if(handlers[i].match(buffer)) 
+            {
+                handlers[i].action(filename, buffer);
+                handled = 1;
                 break;
-            case REMOVE:
-                result = action_remove(filename, buffer);
-                break;
-            case COUNT:
-                result = action_count(filename, buffer);
-                break;
-            case EXIT:
-                result = action_exit();  
-                break;
-            case ADD:
-                result = action_add(filename, buffer);
-                break;
+            }
+        }
+        if (!handled) 
+        {
+            action_add(filename, buffer);
         }
     }
 
     return 0;
 }
-
