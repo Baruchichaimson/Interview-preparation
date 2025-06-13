@@ -1,5 +1,5 @@
-#ifndef __EXC_BIT_H__
-#define __EXC_BIT_H__
+#ifndef __EXC_H__
+#define __EXC_H__
 
 #include <stddef.h>
 
