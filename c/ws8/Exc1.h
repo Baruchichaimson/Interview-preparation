@@ -10,19 +10,20 @@
  Reviewer:  
  Status:    
 ***************************/
+typedef struct Operator Operator;
 
-typedef void (*AddFunc)(void* value);
-typedef void (*PrintFunc)(void* value);
-typedef void (*ClearFunc)(void* value);
+typedef void (*AddFunc)(Operator* op);
+typedef void (*PrintFunc)(Operator* op);
+typedef void (*ClearFunc)(Operator* op);
 
-
-typedef struct 
+struct Operator
 {
     AddFunc add;
     PrintFunc print;
     ClearFunc clear;
     void* value;
-} Operator;
+};
+
 
 
 void InitInt(Operator* element, int value);

@@ -14,56 +14,55 @@
 
 
 /*****ADD-FUNCTIONS*********/
-void AddInt(void* value)
+void AddInt(Operator* op)
 { 
-	(*(int*)value) += 10; 
+	*(int*)&op->value += 10; 
 }
-void AddFloat(void* value)
+void AddFloat(Operator* op)
 { 
-	(*(float*)value) += 1.5f; 
+	*(float*)&op->value += 1.5f; 
 }
-void AddString(void* value)   
+void AddString(Operator* op)   
 { 
-	char** p_str = (char**)value;
-    char* str = *p_str;
+	char* str = (char*)op->value;
     const char* to_add = " append";
-    
+
     size_t new_len = strlen(str) + strlen(to_add) + 1;
     char* new_str = realloc(str, new_len);
     assert(new_str != NULL);
-    
+
     strcat(new_str, to_add);
-    *p_str = new_str;
+    op->value = new_str; 
 }
 
 
 /*****PRINT-FUNCTIONS*********/
-void PrintInt(void* value)    
+void PrintInt(Operator* op)    
 { 
-	printf("Int: %d\n", *(int*)value); 
+	printf("Int: %d\n", *((int*)&op->value)); 
 }
-void PrintFloat(void* value)  
+void PrintFloat(Operator* op)  
 { 
-	printf("Float: %.2f\n", *(float*)value); 
+	printf("Float: %.2f\n", *((float*)&op->value)); 
 }
-void PrintString(void* value) 
+void PrintString(Operator* op) 
 { 
-    printf("String: %s\n", *(char**)value); 
+    printf("String: %s\n", (char*)op->value); 
 }
 
 
 /*****CLEAR-FUNCTIONS*********/
-void ClearInt(void* value)    
+void ClearInt(Operator* op)    
 { 
-	*(int*)value = 0; 
+	*(int*)&op->value = 0; 
 }
-void ClearFloat(void* value)  
+void ClearFloat(Operator* op)  
 { 
-	*(float*)value = 0.0f; 
+	*(float*)&op->value = 0.0f; 
 }
-void ClearString(void* value) 
+void ClearString(Operator* op) 
 { 
-    (*(char**)value)[0] = '\0';
+    ((char*)op->value)[0] = '\0';
 }
 
 
@@ -86,18 +85,14 @@ void InitFloat(Operator* element, float value)
 
 void InitStr(Operator* element, const char* str)
 {
-    char* p = (char*)malloc(strlen(str) + 1);
+    char* p = malloc(strlen(str) + 1);
     assert(p != NULL);
     strcpy(p, str);
-    
-    char** holder = (char**)malloc(sizeof(char*)); 
-    assert(holder != NULL);
-    *holder = p;
 
     element->add = AddString;
     element->print = PrintString;
     element->clear = ClearString;
-    element->value = holder;
+    element->value = p;
 }
 
 
@@ -107,7 +102,7 @@ void printAll(Operator* element, size_t size)
 	size_t i;
     for (i = 0; i < size; ++i)
     {
-        element[i].print(element[i].value);
+        element[i].print(&element[i]);
     }
 }
 
@@ -116,7 +111,7 @@ void addAll(Operator* element, size_t size)
 	size_t i;
     for (i = 0; i < size; ++i)
     {
-        element[i].add(element[i].value);
+        element[i].add(&element[i]);
     }
 }
 
@@ -125,9 +120,10 @@ void clearAll(Operator* element, size_t size)
 	size_t i;
     for (i = 0; i < size; ++i)
     {
-        element[i].clear(element[i].value);
+        element[i].clear(&element[i]);
     }
 }
+
 void freeAll(Operator* element, size_t size)
 {
     size_t i;
@@ -135,8 +131,7 @@ void freeAll(Operator* element, size_t size)
     {
         if (element[i].clear == ClearString)
         {
-            free(*(char**)element[i].value);  
-            free(element[i].value);           
+            free(element[i].value); 
         }
     }
 }
