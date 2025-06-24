@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 void itoa10(int value, char* str)
 {
@@ -133,6 +134,60 @@ void ItoaBase(int value, char* str, int base)
         ++q;
         --r;
     }
+}
+
+int AtoiBase(const char *str, int base) 
+{
+    int digit = 0;
+    int result = 0;
+    int sign = 1;
+    if (base == 10) 
+    {
+        return atoi10(str);
+    }
+    
+    if (base < 2 || base > 36)
+    {
+        return 0;
+    }
+    
+    while (isspace(*str))
+    {
+        str++;
+    }
+    
+    if (*str == '-') 
+    {
+        sign = -1; 
+        str++;
+    }
+    else if (*str == '+') 
+    {
+        str++;
+    }
+    
+    while (*str) 
+    {
+        
+        if (isdigit(*str)) 
+            digit = *str - '0';
+        else if (isupper(*str)) 
+            digit = *str - 'A' + 10;
+        else if (islower(*str)) 
+            digit = *str - 'a' + 10;
+        else 
+            break;
+            
+        if (digit >= base) 
+        {
+            break;
+        }
+        
+        result = result * base + digit;
+        str++;
+    }
+    
+    return result * sign;
 }
 
 void PrintUniqueChars(const char* a, const char* b, const char* c)
