@@ -29,27 +29,70 @@ typedef struct {
 
 #pragma pack(pop) /* release the define that dont do a padding */
 
-void saveStudentToFile(const char* filename, const Student* s)
+void saveStudentToFile(const char* filename, const Student* student)
 {
+	size_t len_first = strlen(student->first_name) + 1;
+    size_t len_last = strlen(student->last_name) + 1;
+    
     FILE* f = fopen(filename, "wb");
     if (!f)
     {
         perror("Failed to open file for writing");
         exit(1);
     }
-    fwrite(s, sizeof(Student), 1, f);
+    
+	
+	fwrite(&len_first, sizeof(size_t), 1, f);
+	fwrite(&len_last, sizeof(size_t), 1, f);
+
+    fwrite(student->first_name, sizeof(char), len_first, f);
+    fwrite(student->last_name, sizeof(char), len_last, f);
+
+    fwrite(&student->grades.humanistic.sociology, sizeof(float), 1, f);
+    fwrite(&student->grades.humanistic.psychology, sizeof(float), 1, f);
+    fwrite(&student->grades.humanistic.literature, sizeof(float), 1, f);
+
+    fwrite(&student->grades.real.math, sizeof(float), 1, f);
+    fwrite(&student->grades.real.physics, sizeof(float), 1, f);
+
+    fwrite(&student->grades.sports, sizeof(float), 1, f);
+    
     fclose(f);
 }
 
-void loadStudentFromFile(const char* filename, Student* s)
+void loadStudentFromFile(const char* filename, Student* student)
 {
+	size_t len_first, len_last;
+    
     FILE* f = fopen(filename, "rb");
     if (!f)
     {
         perror("Failed to open file for reading");
         exit(1);
     }
-    fread(s, sizeof(Student), 1, f);
+    
+    fread(&len_first, sizeof(size_t), 1, f);
+	fread(&len_last, sizeof(size_t), 1, f);
+    
+    if (len_first > sizeof(student->first_name) || len_last > sizeof(student->last_name))
+	{
+		fprintf(stderr, "Name too long for buffer\n");
+		fclose(f);
+		exit(1);
+	}
+
+    fread(student->first_name, sizeof(char), len_first, f);
+    fread(student->last_name, sizeof(char), len_last, f);
+
+    fread(&student->grades.humanistic.sociology, sizeof(float), 1, f);
+    fread(&student->grades.humanistic.psychology, sizeof(float), 1, f);
+    fread(&student->grades.humanistic.literature, sizeof(float), 1, f);
+
+    fread(&student->grades.real.math, sizeof(float), 1, f);
+    fread(&student->grades.real.physics, sizeof(float), 1, f);
+
+    fread(&student->grades.sports, sizeof(float), 1, f);
+    
     fclose(f);
 }
 

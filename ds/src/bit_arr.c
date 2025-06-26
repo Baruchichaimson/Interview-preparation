@@ -152,13 +152,16 @@ bit_arr_t BitArrFlipBit(bit_arr_t bit_arr, size_t index)
 
 size_t BitArrCountOn(bit_arr_t bit_arr)
 {
-	bit_arr = bit_arr - ((bit_arr >> 1) & 0x5555555555555555UL); /* checks every even. */
-    bit_arr = (bit_arr & 0x3333333333333333UL) + ((bit_arr >> 2) & 0x3333333333333333UL); /* checks every couple.*/
-    bit_arr = (bit_arr + (bit_arr >> 4)) & 0x0F0F0F0F0F0F0F0FUL;/* checks every four.*/
-    bit_arr = bit_arr + (bit_arr >> 8);
-    bit_arr = bit_arr + (bit_arr >> 16);
-    bit_arr = bit_arr + (bit_arr >> 32);
-    return bit_arr & 0x7F; 
+	/* div any group to half and sum it to is neighbord */
+    bit_arr = (bit_arr & 0x5555555555555555) + ((bit_arr >> 1) & 0x5555555555555555); 
+    bit_arr = (bit_arr & 0x3333333333333333) + ((bit_arr >> 2) & 0x3333333333333333); 
+    bit_arr = (bit_arr & 0x0F0F0F0F0F0F0F0F) + ((bit_arr >> 4) & 0x0F0F0F0F0F0F0F0F); 
+    bit_arr = (bit_arr & 0x00FF00FF00FF00FF) + ((bit_arr >> 8) & 0x00FF00FF00FF00FF);
+    bit_arr = (bit_arr & 0x0000FFFF0000FFFF) + ((bit_arr >> 16) & 0x0000FFFF0000FFFF);
+    bit_arr = (bit_arr & 0x00000000FFFFFFFF) + ((bit_arr >> 32) & 0x00000000FFFFFFFF);
+     
+    return bit_arr;
+}
 
 }
 size_t BitArrCountOff(bit_arr_t bit_arr)
@@ -173,12 +176,13 @@ bit_arr_t BitArrMirror(bit_arr_t bit_arr)
     bit_arr = ((bit_arr & 0x00FF00FF00FF00FFULL) << 8) | ((bit_arr & 0xFF00FF00FF00FF00ULL) >> 8);
     bit_arr = ((bit_arr & 0x0000FFFF0000FFFFULL) << 16) | ((bit_arr & 0xFFFF0000FFFF0000ULL) >> 16);
     bit_arr = ((bit_arr & 0x00000000FFFFFFFFULL) << 32) | ((bit_arr & 0xFFFFFFFF00000000ULL) >> 32);
+    
     return bit_arr;
 }
 char *BitArrToString(bit_arr_t bit_arr, char* str)
 {
 	size_t i = 0;
-	char bit = '';
+	char bit;
 	if(str == NULL)
 	{
 		return NULL;
