@@ -4,6 +4,7 @@
 #define SIZE_BIT (sizeof(bit_arr_t) * CHAR_BIT)
 
 /* ==================question 9 =========================================*/
+/* ---- LUT for Counting Bits Set to 1 ---- */
 static const unsigned char LUT_COUNT_ON_BITS[256] =
 {
     0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4,
@@ -23,6 +24,8 @@ static const unsigned char LUT_COUNT_ON_BITS[256] =
     3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
     4, 5, 5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8
 };
+
+/* ---- LUT for Bit Mirror ---- */
 static const unsigned char LUT_MIRROR[256] = {
     0x00, 0x80, 0x40, 0xC0, 0x20, 0xA0, 0x60, 0xE0,
     0x10, 0x90, 0x50, 0xD0, 0x30, 0xB0, 0x70, 0xF0,
@@ -74,7 +77,7 @@ bit_arr_t BitArrSetAllOff(bit_arr_t bit_arr)
 
 bit_arr_t BitArrSetBit(bit_arr_t bit_arr, size_t index, int value)
 {
-    if (index > 64)
+    if (index > SIZE_BIT)
     {
         return bit_arr; 
     }
@@ -91,7 +94,7 @@ bit_arr_t BitArrSetBit(bit_arr_t bit_arr, size_t index, int value)
 
 int BitArrGetBit(bit_arr_t bit_arr, size_t index)
 {
-	if (index > 64)
+	if (index > SIZE_BIT)
     {
         return -1; 
     }
@@ -149,9 +152,9 @@ bit_arr_t BitArrFlipBit(bit_arr_t bit_arr, size_t index)
 
 size_t BitArrCountOn(bit_arr_t bit_arr)
 {
-	bit_arr = bit_arr - ((bit_arr >> 1) & 0x5555555555555555UL); /* checks every even. the mask: 01010101.... */
-    bit_arr = (bit_arr & 0x3333333333333333UL) + ((bit_arr >> 2) & 0x3333333333333333UL); /* checks every couple. the mask: 0011 0011.... */
-    bit_arr = (bit_arr + (bit_arr >> 4)) & 0x0F0F0F0F0F0F0F0FUL;/* checks every four. the mask: 1111 1111.... */
+	bit_arr = bit_arr - ((bit_arr >> 1) & 0x5555555555555555UL); /* checks every even. */
+    bit_arr = (bit_arr & 0x3333333333333333UL) + ((bit_arr >> 2) & 0x3333333333333333UL); /* checks every couple.*/
+    bit_arr = (bit_arr + (bit_arr >> 4)) & 0x0F0F0F0F0F0F0F0FUL;/* checks every four.*/
     bit_arr = bit_arr + (bit_arr >> 8);
     bit_arr = bit_arr + (bit_arr >> 16);
     bit_arr = bit_arr + (bit_arr >> 32);
@@ -174,8 +177,12 @@ bit_arr_t BitArrMirror(bit_arr_t bit_arr)
 }
 char *BitArrToString(bit_arr_t bit_arr, char* str)
 {
-	size_t i;
-	char bit;
+	size_t i = 0;
+	char bit = '';
+	if(str == NULL)
+	{
+		return NULL;
+	}
     for (i = 0; i < SIZE_BIT; ++i)
     {
 
