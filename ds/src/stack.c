@@ -46,7 +46,9 @@ void StackDestroy(stack_t* stack)
 {
     assert(stack);
     free(stack->elements);
+    stack->elements = NULL;
     free(stack);
+    stack = NULL;
 }
 
 void StackPush(stack_t* stack, const void* element)
