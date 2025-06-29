@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "../include/foo.h"
+#include "foo.h"
 
 int main() {
     printHello();
