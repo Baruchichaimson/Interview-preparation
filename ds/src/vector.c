@@ -1,7 +1,7 @@
-#include <stdlib.h> 
-#include <string.h> 
-#include <assert.h>
-#include "vector.h"
+#include <stdlib.h>     /* malloc, realloc, free */
+#include <string.h>     /* memcpy */
+#include <assert.h>     /* assert */
+#include "vector.h"     /* vector_t interface */
 
 struct Vector
 {
@@ -14,8 +14,16 @@ struct Vector
 
 vector_t* VectorCreate(size_t init_capacity, size_t element_size)
 {
+	if (element_size == 0)
+    {
+        return NULL;
+    }
+    
     vector_t* vec = (vector_t*)malloc(sizeof(vector_t));
-    if (!vec) return NULL;
+    if (!vec)
+    { 
+    	return NULL;
+    }
 	vec->capacity = init_capacity < DEFAULT_CAPACITY ? DEFAULT_CAPACITY : init_capacity;
     vec->buffer = (char*)malloc(vec->capacity * element_size);
     if (!vec->buffer)
@@ -47,7 +55,7 @@ int VectorPushBack(vector_t* vec, const void* data)
 
     if (vec->size == vec->capacity)
     {
-        if (VectorReserve(vec, vec->capacity *= 2) != 0)
+        if (VectorReserve(vec, vec->capacity * 2) != 0)
         {
             return 1; 
         }
@@ -61,17 +69,12 @@ int VectorPushBack(vector_t* vec, const void* data)
 
 void VectorPopBack(vector_t* vec)
 {
-	size_t new_capacity = 0;
     assert(vec);
-    if(vec->size > 0)
+    assert(vec->size > 0);
+    --vec->size;
+    if (vec->size * 4 <= vec->capacity)
     {
-    	--vec->size;
-	}
-    if (vec->capacity > 0 && vec->size * 4 <= vec->capacity)
-    {
-        new_capacity = vec->capacity / 2;
-   
-        VectorReserve(vec, new_capacity);
+        VectorReserve(vec, vec->capacity / 2;);
     }
 }
 
@@ -98,13 +101,13 @@ size_t VectorCapacity(const vector_t* vec)
 
 int VectorReserve(vector_t* vec, size_t new_capacity)
 {
-	char* new_buffer;
+	char* new_buffer = NULL;
     assert(vec);
 	if(new_capacity < DEFAULT_CAPACITY)
 	{
 		new_capacity = DEFAULT_CAPACITY;
 	}
-    if (new_capacity <= vec->size)
+    else if (new_capacity <= vec->size)
     {
         VectorShrink(vec);
         return 0;
@@ -113,6 +116,7 @@ int VectorReserve(vector_t* vec, size_t new_capacity)
     new_buffer = (char*)realloc(vec->buffer, new_capacity * vec->element_size);
     if (!new_buffer)
     {
+    	VectorDestroy(vec);
         return 1; 
     }
     vec->buffer = new_buffer;
@@ -126,7 +130,6 @@ void VectorShrink(vector_t* vec)
 	char* new_buffer;
     assert(vec);
 	new_buffer = (char*)realloc(vec->buffer, vec->size * vec->element_size);
-	assert(new_buffer);
     
 	vec->capacity = vec->size;
 	if(vec->capacity < DEFAULT_CAPACITY)
