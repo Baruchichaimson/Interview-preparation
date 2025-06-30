@@ -3,5 +3,5 @@
 
 void printHello();
 
-#endif
+#endif /* FOO_H */
 

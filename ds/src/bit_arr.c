@@ -66,7 +66,7 @@ static const unsigned char LUT_MIRROR[256] = {
 bit_arr_t BitArrSetAllOn(bit_arr_t bit_arr)
 {
     (void)bit_arr;
-    return (bit_arr_t)(~0);
+    return ~(bit_arr_t)0;
 }
 
 bit_arr_t BitArrSetAllOff(bit_arr_t bit_arr)
