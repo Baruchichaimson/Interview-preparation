@@ -61,31 +61,41 @@ void SLLDestroy(sll_t* list)
 
 sll_iter_t SLLBegin(const sll_t* list)
 {
+	assert(list);
 	return list->head;
 }
 
 sll_iter_t SLLEnd(const sll_t* list)
 {
+	assert(list);
 	return list->tail;
 }
 
 sll_iter_t SLLNext(sll_iter_t iter)
 {
+	assert(iter);
 	return iter->next;
 }
 
 int SLLIsEqual(sll_iter_t iter1, sll_iter_t iter2)
 {
+	assert(iter1);
+	assert(iter2);
 	return (iter1 == iter2);
 }
 
 void* SLLGetData(sll_iter_t iter)
 {
+	assert(iter);
+	assert(iter->next);
 	return iter->data;
 }
 
 void SLLSetData(sll_iter_t iter, void* data)
 {
+	assert(iter);
+	assert(iter->next);
+	assert(data);
 	iter->data = data;
 }
 
@@ -139,12 +149,16 @@ size_t SLLCount(const sll_t* list)
 }
 int SLLIsEmpty(const sll_t* list)
 {
+	assert(list);
 	return (list->head == list->tail);
 }
 
 sll_iter_t SLLFind(sll_iter_t from, sll_iter_t to, is_match_func_t is_match, void* param)
 {
+	assert(from);
+    assert(to);
 	assert(is_match);
+	
 	while(!SLLIsEqual(from, to))
 	{
 		if(is_match(from->data, param))
@@ -157,7 +171,10 @@ sll_iter_t SLLFind(sll_iter_t from, sll_iter_t to, is_match_func_t is_match, voi
 }
 int SLLForEach(sll_iter_t from, sll_iter_t to, action_func_t action_func, void* param)
 {
+	assert(from);
+    assert(to);
 	assert(action_func);
+	
 	while(!SLLIsEqual(from, to))
 	{
 		if(!action_func(from->data, param))
