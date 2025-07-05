@@ -245,7 +245,8 @@ void TestSLLRemove()
     {
         printf("FAIL: Remove count mismatch (Expected: %lu, Actual: %lu)\n", before - 1, after);
     }
-
+    SLLRemove(SLLBegin(list));
+    printf("PASS: Remove reduced count 0");
     free(a);
     free(b);
     SLLDestroy(list);

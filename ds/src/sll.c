@@ -120,21 +120,6 @@ sll_iter_t SLLInsert(sll_iter_t where, void* data)
 	return where;
 }
 
-sll_iter_t SLLRemove(sll_iter_t to_remove)
-{
-	node_t* node = NULL;
-	sll_iter_t next = NULL;
-	assert(to_remove);
-	assert(to_remove->next);
-
-	node = to_remove->next;
-	to_remove->data = node->data;
-	to_remove->next = node->next;
-	
-	next = node->next;
-    free(node);
-    return next;
-}
 size_t SLLCount(const sll_t* list)
 {
 	size_t count = 0; 
@@ -148,6 +133,36 @@ size_t SLLCount(const sll_t* list)
 	}
 	return count;
 }
+
+sll_iter_t SLLRemove(sll_iter_t to_remove)
+{
+    node_t *node = NULL;
+    sll_t *list = NULL;
+
+    assert(to_remove);
+    assert(to_remove->next); 
+
+    node = to_remove->next;
+
+    if (node->next == NULL)
+    {
+        list = (sll_t *)node->data;
+
+        to_remove->next = NULL;
+        list->tail = to_remove;
+
+        free(node);
+        return to_remove->next;
+    }
+
+    to_remove->data = node->data;
+    to_remove->next = node->next;
+
+    free(node);
+
+    return to_remove->next;
+}
+
 int SLLIsEmpty(const sll_t* list)
 {
 	assert(list);

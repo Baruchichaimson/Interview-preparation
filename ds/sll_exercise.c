@@ -138,7 +138,7 @@ int main()
 
     FreeList(head);
 
-    /* =====  Hashloop ===== */
+    /* =====  Hasloop ===== */
     node_t *loop_list = CreateNode(1);
     loop_list->next = CreateNode(2);
     loop_list->next->next = CreateNode(3);
@@ -147,11 +147,11 @@ int main()
 
     if (Hashloop(loop_list))
     {
-        printf("Hashloop: Loop detected ✅\n");
+        printf("\nHashloop: Loop detected \n\n");
     }
     else
     {
-        printf("Hashloop: No loop ❌\n");
+        printf("\nHashloop: No loop \n\n");
     }
 
 
@@ -174,19 +174,18 @@ int main()
     node_t *intersection = Findinstruction(list1, list2);
     if (intersection)
     {
-        printf("Intersection found at node with data: %d ✅\n", *(int *)intersection->data);
+        printf("Intersection found at node with data: %d \n", *(int *)intersection->data);
     }
     else
     {
-        printf("No intersection ❌\n");
+        printf("No intersection \n");
     }
 
     FreeList(list1); 
-    free(common->next->data);
-    free(common->next);
-    free(common->data);
-    free(common);
-    free(list2); 
+  
+    free(list2->data);
+    free(list2);
+
 
     return 0;
 }
