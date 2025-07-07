@@ -10,3 +10,5 @@
 !*.mak
 !**/makefile
 !Makefile
+!make
+
