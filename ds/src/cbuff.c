@@ -24,8 +24,8 @@ struct cbuff
 cbuff_t* CBuffCreate(size_t capacity)
 {
 	cbuff_t* cbuff = NULL;
-	capacity = (DEFAULT_SIZE < capacity) ? capacity : DEFAULT_SIZE;
-	cbuff = (cbuff_t*)malloc(sizeof(cbuff) + (capacity * sizeof(char) - DEFAULT_SIZE));
+	capacity = (DEFAULT_CAP < capacity) ? capacity : DEFAULT_CAP;
+	cbuff = (cbuff_t*)malloc(sizeof(cbuff) + (capacity * sizeof(char) - DEFAULT_CAP));
 	if(!cbuff)
 	{
 		return NULL;
@@ -46,24 +46,25 @@ void CBuffDestroy(cbuff_t* cbuff)
 
 ssize_t CBuffWrite(cbuff_t* cbuff, const void* src, size_t bytes)
 {
+	size_t amount_write = 0;
+	size_t start = 0;
+	size_t space_in_end = 0;
+	
 	assert (cbuff); 
 	
-	size_t amount_write = (bytes < CBuffFreeSpace(cbuff)) ? bytes : CBuffFreeSpace(cbuff);
+	if (src == NULL) 
+    {
+    	return -1;
+    }
 	
-    size_t start = (cbuff->front + cbuff->size) % cbuff->capacity;
-    
-    size_t space_in_end = 0;
+	amount_write = (bytes < CBuffFreeSpace(cbuff)) ? bytes : CBuffFreeSpace(cbuff);
+    start = (cbuff->front + cbuff->size) % cbuff->capacity;
     
     if (amount_write == 0)
 	{
 		return 0;
 	}
 
-    if (src == NULL) 
-    {
-    	return -1;
-    }
-    
     if (start + amount_write <= cbuff->capacity)
     {
         memcpy(cbuff->buffer + start, src, amount_write);
@@ -76,16 +77,19 @@ ssize_t CBuffWrite(cbuff_t* cbuff, const void* src, size_t bytes)
     }
 
     cbuff->size += amount_write;
+    
     return (ssize_t)amount_write;
 }
 
 
 ssize_t CBuffRead(cbuff_t* cbuff, void* dst, size_t bytes)
 {
+	size_t amount_read = 0;
+	size_t space_in_end = 0;
+	
     assert(cbuff);
 	
 	size_t amount_read = (bytes < cbuff->size) ? bytes : cbuff->size;
-    size_t space_in_end = 0;
     
     if (amount_read == 0)
 	{
