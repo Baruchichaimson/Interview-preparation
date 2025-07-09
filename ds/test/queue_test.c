@@ -1,3 +1,11 @@
+/***************************
+ Exercise:  queue
+ Date: 	    05/07/25
+ Developer: Baruch Haimson
+ Reviewer:  Yael
+ Status:    Approved
+***************************/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "queue.h"

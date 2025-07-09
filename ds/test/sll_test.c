@@ -1,3 +1,11 @@
+/***************************
+ Exercise:  sll
+ Date: 	    04/07/25
+ Developer: Baruch Haimson
+ Reviewer:  Yael
+ Status:    Approved
+***************************/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "sll.h"

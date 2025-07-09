@@ -116,7 +116,7 @@ ssize_t CBuffRead(cbuff_t* cbuff, void* dst, size_t bytes);
  * Time Complexity:
  *     - O(1)
  ---------------------------------------------------------*/
-int CBuffIsEmpty(cbuff_t* cbuff);
+int CBuffIsEmpty(const cbuff_t* cbuff);
 
 /*---------------------------------------------------------
  * Function: CBuffFreeSpace
@@ -136,7 +136,7 @@ int CBuffIsEmpty(cbuff_t* cbuff);
  * Time Complexity:
  *     - O(1)
  ---------------------------------------------------------*/
-size_t CBuffFreeSpace(cbuff_t* cbuff);
+size_t CBuffFreeSpace(const cbuff_t* cbuff);
 
 /*---------------------------------------------------------
  * Function: CBuffSize
@@ -156,7 +156,7 @@ size_t CBuffFreeSpace(cbuff_t* cbuff);
  * Time Complexity:
  *     - O(1)
  ---------------------------------------------------------*/
-size_t CBuffSize(cbuff_t* cbuff);
+size_t CBuffSize(const cbuff_t* cbuff);
 
 #endif /* _ILRD_CBUFF_ */
 

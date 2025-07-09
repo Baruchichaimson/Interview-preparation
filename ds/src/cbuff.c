@@ -89,7 +89,7 @@ ssize_t CBuffRead(cbuff_t* cbuff, void* dst, size_t bytes)
 	
     assert(cbuff);
 	
-	size_t amount_read = (bytes < cbuff->size) ? bytes : cbuff->size;
+	amount_read = (bytes < cbuff->size) ? bytes : cbuff->size;
     
     if (amount_read == 0)
 	{
@@ -119,20 +119,20 @@ ssize_t CBuffRead(cbuff_t* cbuff, void* dst, size_t bytes)
     return (ssize_t)amount_read;
 }
 
-int CBuffIsEmpty(cbuff_t* cbuff)
+int CBuffIsEmpty(const cbuff_t* cbuff)
 {
 	assert(cbuff);
 	return (cbuff->size == 0);
 }
 
 
-size_t CBuffFreeSpace(cbuff_t* cbuff)
+size_t CBuffFreeSpace(const cbuff_t* cbuff)
 {
 	assert(cbuff);
 	return (cbuff->capacity - cbuff->size);
 }
 
-size_t CBuffSize(cbuff_t* cbuff)
+size_t CBuffSize(const cbuff_t* cbuff)
 {
 	assert(cbuff);
 	return cbuff->size;

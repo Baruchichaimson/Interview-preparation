@@ -1,3 +1,11 @@
+/***************************
+ Exercise:  queue
+ Date: 	    05/07/25
+ Developer: Baruch Haimson
+ Reviewer:  Yael
+ Status:    Approved
+***************************/
+
 #ifndef _ILRD_QUEUE_
 #define _ILRD_QUEUE_
 

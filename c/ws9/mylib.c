@@ -1,6 +1,6 @@
 #include <stddef.h>
 #include <stdint.h>
-
+#
 void *MyMemset(void *dest, int c, size_t n)
 {
     unsigned char *byte_ptr = dest;
