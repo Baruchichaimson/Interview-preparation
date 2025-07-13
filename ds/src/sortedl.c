@@ -206,18 +206,22 @@ void* SortedLPopBack(sortedl_t* list)
 
 void SortedLMerge(sortedl_t* dest, sortedl_t* src)
 {
-    sorted_iter_t from = SortedLBegin(src);
-    sorted_iter_t to = SortedLEnd(src);
+	sorted_iter_t next = {0};
+    sorted_iter_t from_s = SortedLBegin(src);
+    sorted_iter_t to_s = SortedLEnd(src);
+    
+    sorted_iter_t from_d = SortedLBegin(dest);
+    sorted_iter_t to_d = SortedLEnd(dest);
 
-    while (!SortedLIsEqual(from, to))
+    while (!SortedLIsEqual(from_s, to_s))
     {
-        sorted_iter_t next = SortedLNext(from);
-        void* data = SortedLGetData(from);
-
-        SortedLInsert(dest, data);
-        SortedLRemove(from);
-
-        from = next;
+      while(!SortedLIsEqual(from_d, to_d) && dest->cmp(SortedLGetData(from_s), SortedLGetData(from_d)) > 0)
+      {
+      		from_d = SortedLNext(from_d);
+      }
+      next = SortedLNext(from_s);
+      DLLSplice(from_d.iter, from_s.iter, SortedLNext(from_s).iter);
+      from_s = next;
     }
 }
 
