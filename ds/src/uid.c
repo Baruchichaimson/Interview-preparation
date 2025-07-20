@@ -1,12 +1,21 @@
-#include <ifaddrs.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include "uid.h"
+/***************************
+ * Exercise: uid
+ * Date:     10/07/25
+ * Developer: Baruch Haimson
+ * Reviewer: matan
+ * Status:   Aproved
+ ***************************/
+
+
+#include <ifaddrs.h>    /* getifaddrs, freeifaddrs, struct ifaddrs */
+#include <stdio.h>      /* printf, perror */
+#include <stdlib.h>     /* malloc, free, exit */
+#include <unistd.h>     /* getpid, sleep */
+#include <string.h>     /* memcpy, memset, strlen */
+#include <sys/socket.h> /* struct sockaddr, socket functions */
+#include <netinet/in.h> /* struct sockaddr_in, htons */
+#include <arpa/inet.h>  /* inet_ntop, inet_pton */
+#include "uid.h"        /* ilrd_uid_t, UIDCreate */
 
 static char* getip(char *ip_out);
 
