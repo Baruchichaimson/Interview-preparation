@@ -57,22 +57,14 @@ int PQEnqueue(pq_t* pq , void* data)
 
 void* PQRemove(pq_t* pq)
 {
-	void *data = NULL;
-    sorted_iter_t iter;
-
     assert(pq);
     
     if (PQIsEmpty(pq))
     {
         return NULL;
     }
-    
-    iter = SortedLBegin(pq->queue);
-    data = SortedLGetData(iter);
 
-    SortedLRemove(iter);
-
-    return data;
+    return SortedLPopBack(pq->queue);  
 }
 
 void* PQPeek(const pq_t* pq)
@@ -80,7 +72,7 @@ void* PQPeek(const pq_t* pq)
 	assert(pq);
     assert(!PQIsEmpty(pq));
 
-    return SortedLGetData(SortedLBegin(pq->queue));
+    return SortedLGetData(SortedLPrev(SortedLEnd(pq->queue)));
 }
 
 int PQIsEmpty(const pq_t* pq)
