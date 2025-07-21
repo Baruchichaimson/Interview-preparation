@@ -8,7 +8,6 @@
 
 #include <stdlib.h>
 #include <assert.h>
-#include <stdio.h>
 #include "sortedl.h"
 #include "dll.h"
 
@@ -122,9 +121,9 @@ sorted_iter_t SortedLFindIf(sorted_iter_t from, sorted_iter_t to, int (*is_match
 	assert(from.list == to.list);
 	assert(is_match_func);
 	
-	result.iter = DLLFind(from.iter ,to.iter, is_match_func, param);
+	from.iter = DLLFind(from.iter ,to.iter, is_match_func, param);
 
-	return result;
+	return from;
 }
 
 int SortedLIsEqual(sorted_iter_t iter1, sorted_iter_t iter2)
