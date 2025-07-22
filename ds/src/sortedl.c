@@ -17,9 +17,16 @@ struct sortedl
     int (*cmp)(const void* data1, const void* data2);
 };
 
+typedef struct cmp
+{
+	int (*cmp)(const void* data1, const void* data2);
+	void* data;
+}cmp_h;
+
+
 /*------------------------- Helper Functions -------------------------*/
 
-static dll_iter_t FindInsertPosition(const sortedl_t* list, const void* data);
+static int Matchcmp(const void* data, const void* param);
 
 /*---------------------------- API Functions -------------------------*/
 
@@ -57,10 +64,19 @@ void SortedLDestroy(sortedl_t* list)
 sorted_iter_t SortedLInsert(sortedl_t* list, void* data)
 {
     sorted_iter_t iter_for_insert;
+    
+	cmp_h* cmp_handler = (cmp_h*)malloc(sizeof(cmp_h));
+	cmp_handler->cmp = list->cmp;
+	cmp_handler->data= data;
+
+	if(!cmp_handler)
+	{
+		return SortedLEnd(list);
+	}
 
     assert(list);
-
-    dll_iter_t pos = FindInsertPosition(list, data);
+    
+	dll_iter_t pos = DLLFind(DLLBegin(list->list) , DLLEnd(list->list), Matchcmp, cmp_handler);
 
     iter_for_insert.iter = DLLInsert(list->list, pos, data);
 
@@ -68,6 +84,8 @@ sorted_iter_t SortedLInsert(sortedl_t* list, void* data)
     iter_for_insert.list = list;
 #endif
 
+	free(cmp_handler);
+	
     return iter_for_insert;
 }
 
@@ -220,15 +238,10 @@ int SortedLForEach(sorted_iter_t from, sorted_iter_t to, int (*action_func)(void
 
 /*------------------------- Helper Functions -------------------------*/
 
-static dll_iter_t FindInsertPosition(const sortedl_t* list, const void* data)
+static int Matchcmp(const void* data, const void* param)
 {
-	dll_iter_t iter = DLLBegin(list->list);
-
-    while (!DLLIsEqual(iter, DLLEnd(list->list)) && list->cmp(data, DLLGetData(iter)) > 0)
-    {
-        iter = DLLNext(iter);
-    }
-
-    return iter;
+	cmp_h* cmp_handler = (cmp_h*)param;
+    return cmp_handler->cmp(cmp_handler->data, data) <= 0;
 }
+
 
