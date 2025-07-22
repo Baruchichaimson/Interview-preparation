@@ -98,15 +98,18 @@ void PQClear(pq_t* pq)
 		PQRemove(pq);
 	}
 }
-void PQErase(pq_t* pq, int (*is_match_func)(const void* data, const void* param), const void* param)
+void* PQErase(pq_t* pq, int (*is_match_func)(const void* data, const void* param), const void* param)
 {
-	sorted_iter_t iter = {0};
+	void* data = NULL;
+	sorted_iter_t to_remove = {0};
 	assert(pq);
 	assert(is_match_func);
 
-	iter = SortedLFindIf(SortedLBegin(pq->queue), SortedLEnd(pq->queue), is_match_func, param);
-	if (!SortedLIsEqual(iter, SortedLEnd(pq->queue)))
+	to_remove = SortedLFindIf(SortedLBegin(pq->queue), SortedLEnd(pq->queue), is_match_func, param);
+	if (!SortedLIsEqual(to_remove, SortedLEnd(pq->queue)))
 	{
-		SortedLRemove(iter);
+		data = SortedLGetData(to_remove);
+		SortedLRemove(to_remove);
 	}
+	return data;
 }

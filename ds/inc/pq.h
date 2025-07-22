@@ -131,7 +131,7 @@ void PQClear(pq_t* pq);
  *
  * Time Complexity: O(n)
  */
-void PQErase(pq_t* pq, int (*is_match_func)(const void* data, const void* param), const void* param);
+void* PQErase(pq_t* pq, int (*is_match_func)(const void* data, const void* param), const void* param);
 
 
 #endif /* ILRD_PQ_H */
