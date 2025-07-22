@@ -15,35 +15,20 @@
 #include "task.h"
 #include "uid.h"
 
-/*************************** Struct for op_func ***************************/
 struct data
 {
     int x;
     int y;
-    int cleaned; /* דגל שמראה אם עבר clean */
+    int cleaned; 
 };
 
 /*************************** Helper Functions ***************************/
-static ssize_t SumOp(void *param)
-{
-    struct data *d = (struct data *)param;
-    if (!d) 
-    {
-    	return -999;
-    }
-    return (ssize_t)(d->x + d->y);
-}
 
-static void FreeCleanup(void *param)
-{
-    struct data *d = (struct data *)param;
-    d->cleaned = 1;
-    printf("Cleanup function called, cleaned=%d\n", d->cleaned);
-    free(d);
+static ssize_t SumOp(void *param);
+static void FreeCleanup(void *param);
 
-}
+/************************************************************************/
 
-/*************************** Test Functions ***************************/
 void TestTaskCreate()
 {
     printf("\n--- TestTaskCreate ---\n");
@@ -174,7 +159,6 @@ void TestTaskDestroyNULL()
     printf("TaskDestroy called and task freed\n");
 }
 
-/*************************** Main ***************************/
 int main()
 {
     TestTaskCreate();
@@ -188,5 +172,25 @@ int main()
 
     printf("\nAll tests passed \n");
     return 0;
+}
+
+/*************************** Helper Functions ***************************/
+static ssize_t SumOp(void *param)
+{
+    struct data *d = (struct data *)param;
+    if (!d) 
+    {
+    	return -999;
+    }
+    return (ssize_t)(d->x + d->y);
+}
+
+static void FreeCleanup(void *param)
+{
+    struct data *d = (struct data *)param;
+    d->cleaned = 1;
+    printf("Cleanup function called, cleaned=%d\n", d->cleaned);
+    free(d);
+
 }
 
