@@ -78,7 +78,7 @@ int SchedRun(sched_t* sch)
 	while(!PQIsEmpty(sch->pq) && sch->stop_flag == 0)
 	{
 		task = PQRemove(sch->pq);
-		if(TaskGetTimeToRun(task) > (size_t)time(NULL))
+		while(TaskGetTimeToRun(task) > (size_t)time(NULL))
 		{
 			sleep(TaskGetTimeToRun(task) - (size_t)time(NULL));
 		}
