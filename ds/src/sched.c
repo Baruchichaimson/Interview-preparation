@@ -2,18 +2,18 @@
  * Exercise: Scheduler
  * Date: 23/07/25
  * Developer: Baruch Haimson
- * Reviewer: 
- * Status: In Progress
+ * Reviewer: Yael
+ * Status: Approved
  ***************************/
 
 #include <stdlib.h> /* malloc */
 #include <unistd.h> /* sleep */
 #include <assert.h> /* assert */
 
-#include "sched.h"
-#include "task.h"
-#include "uid.h"
-#include "pq.h"
+#include "sched.h" /* sched API */
+#include "task.h" /* Task API */
+#include "uid.h" /* uid API */
+#include "pq.h" /* pq API */
 
 struct sched
 {
@@ -22,7 +22,7 @@ struct sched
     
 };
 
-enum status { SUCCESS, PART_SUCCESS, ERROR, PART_ERROR , FAIL_ENQUEUE, UNKNOWN_STATE};
+enum status { SUCCESS, FAILED_TASKS_EMPTY_SCHED, PAUSED, FAILED_TASKS_NO_EMPTY_SCHED , FAIL_ENQUEUE, UNKNOWN_STATE};
 
 /***************** helper function *******************************/
 
@@ -122,6 +122,8 @@ ilrd_uid_t SchedAdd(sched_t* sch, ssize_t (*op_func)(void* param), void* param, 
 	task_t* task = NULL;
 
 	assert(sch);
+	assert(op_func);
+	assert(cleanup_func);
 
 	task = TaskCreate(op_func, param, time_exe, cleanup_func, cleanup_param);
 	if(NULL == task)
@@ -131,6 +133,7 @@ ilrd_uid_t SchedAdd(sched_t* sch, ssize_t (*op_func)(void* param), void* param, 
 	
 	if(PQEnqueue(sch->pq , task))
 	{
+		TaskDestroy(task);
 		return UIDbadUID;
 	}
 	
@@ -139,7 +142,7 @@ ilrd_uid_t SchedAdd(sched_t* sch, ssize_t (*op_func)(void* param), void* param, 
 
 void SchedRemove(sched_t* sch, ilrd_uid_t uid)
 {
-	task_t *task = PQErase(sch->pq, WrapperTaskIsMatch, (ilrd_uid_t *)&uid);
+	task_t *task = PQErase(sch->pq, WrapperTaskIsMatch, &uid);
 	
 	assert(sch);
 	
@@ -164,7 +167,7 @@ void SchedClear(sched_t* sch)
 	
 	while (!PQIsEmpty(sch->pq))
 	{
-		 task = PQRemove(sch->pq);
+		 task = (task_t*)PQRemove(sch->pq);
          TaskDestroy(task);  
 	}
 
@@ -184,12 +187,12 @@ static int definedCases(sched_t *sch, int failed)
 {
     if (SchedIsEmpty(sch))
     {
-        return failed ? PART_SUCCESS : SUCCESS;
+        return failed ? FAILED_TASKS_EMPTY_SCHED : SUCCESS;
     }
 
     if (sch->stop_flag)
     {
-        return failed ? PART_ERROR : ERROR;
+        return failed ? FAILED_TASKS_NO_EMPTY_SCHED : PAUSED;
     }
 
     return UNKNOWN_STATE; 

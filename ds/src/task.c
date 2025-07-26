@@ -2,15 +2,15 @@
  * Exercise: Task
  * Date: 22/07/25
  * Developer: Baruch Haimson
- * Reviwer: 
- * Status: In Progress
+ * Reviwer: Yael
+ * Status: Approved
  ***************************/
  
-#include <stdlib.h>
-#include <assert.h>
+#include <stdlib.h> /* malloc */
+#include <assert.h> /* assert */
 
-#include "task.h"
-#include "uid.h"
+#include "task.h"  /* Task API */
+#include "uid.h"  /* uid API */
 
 struct task
 {
