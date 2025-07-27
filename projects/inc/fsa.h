@@ -9,6 +9,8 @@
 #ifndef __ILRD_FSA_H__
 #define __ILRD_FSA_H__
 
+#include <stdlib.h> /* size_t */
+
 typedef struct FSA fsa_t;
 
 /**

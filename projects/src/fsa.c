@@ -6,7 +6,6 @@
  * Status: In Progress
  ************************************/
 
-#include <stdlib.h> /* size_t */
 #include <assert.h> /* assert */
 
 #include "fsa.h" /* fsa API */
@@ -42,7 +41,7 @@ fsa_t* FSAInit(void* fsa, size_t fsa_size, size_t block_size)
 	size_t current_offset = sizeof(fsa_t);
     pool->next_free = current_offset;
 
-     for (i = 0; i < num_of_blocks - 1; ++i)
+    for (i = 0; i < num_of_blocks - 1; ++i)
     {
         curr = (size_t*)((char*)fsa + current_offset);
         current_offset += aligned_block_size;
@@ -57,9 +56,11 @@ fsa_t* FSAInit(void* fsa, size_t fsa_size, size_t block_size)
 void* FSAAlloc(fsa_t* fsa)
 {
 	void* block = NULL;
-	size_t curr_offset = fsa->next_free;
+	size_t curr_offset = 0;
 	
     assert(fsa);
+
+	curr_offset = fsa->next_free;
 
     if (curr_offset == 0)
     {
@@ -69,30 +70,32 @@ void* FSAAlloc(fsa_t* fsa)
 	block = (size_t*)((char*)fsa + curr_offset);
     fsa->next_free = *(size_t*)block;
 
-    return ((char*)block + sizeof(size_t));
+    return (void*)block;
 }
 
 void FSAFree(fsa_t* fsa, void* block)
 {
-	size_t* block_header = NULL;
+	size_t new_next = 0; 
 
-    assert(fsa);
-    if (block == NULL)
-    {
-        return;
-    }
+	assert(fsa);
+	
+	if (NULL == block)
+	{
+		return;
+	}
 
-    block_header = (size_t*)((char*)block - sizeof(size_t));
-    
-    *block_header = fsa->next_free;
+	new_next = ((char*)block - (char*)fsa) ;
+	*(size_t*)((char*)fsa + new_next) = fsa->next_free; 
+	fsa->next_free = new_next;
 
-    fsa->next_free = (char*)block_header - (char*)fsa;
 }
 
 size_t FSACountFree(const fsa_t* fsa)
 {
     size_t count = 0;
     size_t offset = fsa->next_free;
+	
+	assert(fsa);
 
     while (offset != 0)
     {
