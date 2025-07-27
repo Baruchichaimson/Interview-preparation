@@ -19,7 +19,7 @@
 
 typedef struct FSA
 {
-    void* next_free;
+    size_t next_free;
 }fsa_t;
 
 
@@ -31,7 +31,7 @@ size_t FSASuggestSize(size_t block_amount, size_t block_size)
 fsa_t* FSAInit(void* fsa, size_t fsa_size, size_t block_size)
 {
 	size_t i = 0;
-    char* runner = NULL;
+    size_t* curr = NULL;
     
     size_t aligned_block_size = ALIGN_UP(block_size < MIN_BLOCK_SIZE ? MIN_BLOCK_SIZE : block_size);
     
@@ -39,55 +39,66 @@ fsa_t* FSAInit(void* fsa, size_t fsa_size, size_t block_size)
 
     fsa_t* pool = (fsa_t*)fsa;
 
-    pool->next_free = (char*)pool + sizeof(fsa_t*);
+	size_t current_offset = sizeof(fsa_t);
+    pool->next_free = current_offset;
 
-    runner = (char*)pool->next_free;
-
-    for (i = 0; i < num_of_blocks - 1; ++i)
+     for (i = 0; i < num_of_blocks - 1; ++i)
     {
-        *(void**)runner = runner + aligned_block_size;
-        runner += aligned_block_size;
+        curr = (size_t*)((char*)fsa + current_offset);
+        current_offset += aligned_block_size;
+        *curr = current_offset;  
     }
-    *(void**)runner = NULL;
+    
+    *(size_t*)((char*)fsa + current_offset) = 0;
 
     return pool;
 }
 
 void* FSAAlloc(fsa_t* fsa)
 {
+	size_t* block = NULL;
+	size_t curr_offset = fsa->next_free;
+	
     assert(fsa);
 
-    if (fsa->next_free == NULL)
+    if (curr_offset == 0)
     {
         return NULL; 
     }
+	
+	block = (size_t*)((char*)fsa + curr_offset);
+    fsa->next_free = *block;
 
-
-    return;
+    return ((char*)block + sizeof(size_t));
 }
 
 void FSAFree(fsa_t* fsa, void* block)
 {
+	size_t* block_header = NULL;
+
     assert(fsa);
     if (block == NULL)
     {
         return;
     }
 
-  
+    block_header = (size_t*)((char*)block - sizeof(size_t));
+    
+    *block_header = fsa->next_free;
+
+    fsa->next_free = (char*)block_header - (char*)fsa;
 }
 
 size_t FSACountFree(const fsa_t* fsa)
 {
     size_t count = 0;
-    void* runner = NULL;
-    assert(fsa);
+    size_t offset = fsa->next_free;
 
-    runner = fsa->next_free;
-    while (runner != NULL)
+    while (offset != 0)
     {
         ++count;
-        runner = *(void**)runner;
+        size_t* block_header = (size_t*)((char*)fsa + offset);
+        offset = *block_header;  
     }
 
     return count;

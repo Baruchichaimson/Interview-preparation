@@ -14,6 +14,7 @@
 #define BLOCK_COUNT 10
 
 
+/* -------- Test FSASuggestSize -------- */
 void TestFSASuggestSize()
 {
     size_t suggested = FSASuggestSize(BLOCK_COUNT, BLOCK_SIZE);
@@ -30,10 +31,17 @@ void TestFSASuggestSize()
 }
 
 
+/* -------- Test FSAInit -------- */
 void TestFSAInit()
 {
     size_t pool_size = FSASuggestSize(BLOCK_COUNT, BLOCK_SIZE);
     void* pool = malloc(pool_size);
+    if (pool == NULL)
+    {
+        printf("FSAInit: FAIL (malloc failed)\n");
+        return;
+    }
+
     fsa_t* fsa = FSAInit(pool, pool_size, BLOCK_SIZE);
 
     if (fsa != NULL && fsa == pool)
@@ -48,15 +56,24 @@ void TestFSAInit()
     free(pool);
 }
 
+
+/* -------- Test FSAAlloc and FSAFree -------- */
 void TestFSAAllocFree()
 {
     size_t pool_size = FSASuggestSize(BLOCK_COUNT, BLOCK_SIZE);
     void* pool = malloc(pool_size);
+    if (pool == NULL)
+    {
+        printf("FSAAllocFree: FAIL (malloc failed)\n");
+        return;
+    }
+
     fsa_t* fsa = FSAInit(pool, pool_size, BLOCK_SIZE);
 
     void* blocks[BLOCK_COUNT];
-
     size_t i;
+
+
     for (i = 0; i < BLOCK_COUNT; ++i)
     {
         blocks[i] = FSAAlloc(fsa);
@@ -68,6 +85,7 @@ void TestFSAAllocFree()
         }
     }
 
+
     if (FSAAlloc(fsa) == NULL)
     {
         printf("FSAAlloc (full): PASS\n");
@@ -76,6 +94,7 @@ void TestFSAAllocFree()
     {
         printf("FSAAlloc (full): FAIL (expected NULL)\n");
     }
+
 
     for (i = 0; i < BLOCK_COUNT; ++i)
     {
@@ -87,10 +106,18 @@ void TestFSAAllocFree()
     free(pool);
 }
 
+
+/* -------- Test FSACountFree -------- */
 void TestFSACountFree()
 {
     size_t pool_size = FSASuggestSize(BLOCK_COUNT, BLOCK_SIZE);
     void* pool = malloc(pool_size);
+    if (pool == NULL)
+    {
+        printf("FSACountFree: FAIL (malloc failed)\n");
+        return;
+    }
+
     fsa_t* fsa = FSAInit(pool, pool_size, BLOCK_SIZE);
 
     size_t count = FSACountFree(fsa);
@@ -103,6 +130,7 @@ void TestFSACountFree()
         printf("FSACountFree (initial): FAIL (expected %d, got %lu)\n", BLOCK_COUNT, count);
     }
 
+
     void* b1 = FSAAlloc(fsa);
     void* b2 = FSAAlloc(fsa);
 
@@ -113,8 +141,9 @@ void TestFSACountFree()
     }
     else
     {
-        printf("FSACountFree (after 2 allocs): FAIL\n");
+        printf("FSACountFree (after 2 allocs): FAIL (expected %d, got %lu)\n", BLOCK_COUNT - 2, count);
     }
+
 
     FSAFree(fsa, b1);
     FSAFree(fsa, b2);
@@ -126,17 +155,18 @@ void TestFSACountFree()
     }
     else
     {
-        printf("FSACountFree (after free): FAIL\n");
+        printf("FSACountFree (after free): FAIL (expected %d, got %lu)\n", BLOCK_COUNT, count);
     }
 
     free(pool);
 }
 
+
 int main()
 {
-    /*TestFSASuggestSize();
+    TestFSASuggestSize();
     TestFSAInit();
-    TestFSAAllocFree();*/
+    TestFSAAllocFree();
     TestFSACountFree();
 
     return 0;
