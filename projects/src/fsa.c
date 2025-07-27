@@ -56,7 +56,7 @@ fsa_t* FSAInit(void* fsa, size_t fsa_size, size_t block_size)
 
 void* FSAAlloc(fsa_t* fsa)
 {
-	size_t* block = NULL;
+	void* block = NULL;
 	size_t curr_offset = fsa->next_free;
 	
     assert(fsa);
@@ -67,7 +67,7 @@ void* FSAAlloc(fsa_t* fsa)
     }
 	
 	block = (size_t*)((char*)fsa + curr_offset);
-    fsa->next_free = *block;
+    fsa->next_free = *(size_t*)block;
 
     return ((char*)block + sizeof(size_t));
 }
@@ -97,8 +97,7 @@ size_t FSACountFree(const fsa_t* fsa)
     while (offset != 0)
     {
         ++count;
-        size_t* block_header = (size_t*)((char*)fsa + offset);
-        offset = *block_header;  
+        offset = *(size_t*)((char*)fsa + offset);
     }
 
     return count;
