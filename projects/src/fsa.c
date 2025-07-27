@@ -32,13 +32,14 @@ fsa_t* FSAInit(void* fsa, size_t fsa_size, size_t block_size)
 	size_t i = 0;
     size_t* curr = NULL;
     
-    size_t aligned_block_size = ALIGN_UP(block_size < MIN_BLOCK_SIZE ? MIN_BLOCK_SIZE : block_size);
+    size_t aligned_block_size = ALIGN_UP(block_size);
     
     size_t num_of_blocks = (fsa_size - sizeof(fsa_t)) / aligned_block_size;
 
     fsa_t* pool = (fsa_t*)fsa;
 
 	size_t current_offset = sizeof(fsa_t);
+	
     pool->next_free = current_offset;
 
     for (i = 0; i < num_of_blocks - 1; ++i)
