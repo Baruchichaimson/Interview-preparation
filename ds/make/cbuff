@@ -1,16 +1,20 @@
-CC ?= gcc
-CFLAGS ?= -Wall -Wextra -std=c99 -I../inc -g
+# make/cbuff
 
-SRC = ../src/cbuff.c ../test/cbuff_test.c
+CC = cc
+CFLAGS = -Wall -Wextra -std=c99 -I$(HOME)/git/ds/inc -g
 
-TARGET = test_cbuff
+SRC = $(HOME)/git/ds/src/cbuff.c
+TEST = $(HOME)/git/ds/test/cbuff_test.c
+OUT = $(HOME)/git/ds/bin/debug/cbuff_test
 
-all: $(TARGET)
+all: $(OUT)
 
-$(TARGET): $(SRC)
-	$(CC) $(CFLAGS) $^ -o $@
+$(OUT): $(SRC) $(TEST)
+	$(CC) $(CFLAGS) $(SRC) $(TEST) -o $(OUT)
+
+run: all
+	$(OUT)
 
 clean:
-	rm -f $(TARGET) *.o
+	rm -f $(OUT)
 
-.PHONY: all clean

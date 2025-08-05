@@ -16,10 +16,10 @@
 
 #define MIN_BLOCK_SIZE sizeof(void*)
 
-typedef struct FSA
+struct FSA
 {
     size_t next_free;
-}fsa_t;
+};
 
 
 size_t FSASuggestSize(size_t block_amount, size_t block_size)

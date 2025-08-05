@@ -53,6 +53,7 @@ static char* getip(char *ip_out)
 {
     struct ifaddrs *ifaddr;
 	struct ifaddrs *ifa;
+	struct sockaddr_in *sa;
 	const char *res;
     int found = 0;
 
@@ -68,7 +69,7 @@ static char* getip(char *ip_out)
 
         if (ifa->ifa_addr->sa_family == AF_INET)
         {
-            struct sockaddr_in *sa = (struct sockaddr_in *)ifa->ifa_addr;
+            sa = (struct sockaddr_in *)ifa->ifa_addr;
 
             if (ntohl(sa->sin_addr.s_addr) != INADDR_LOOPBACK)
             {

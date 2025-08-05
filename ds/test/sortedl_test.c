@@ -66,7 +66,8 @@ void TestInsert()
 
 void TestRemove()
 {
-	sorted_iter_t it;
+	sorted_iter_t it_c;
+	sorted_iter_t it_d;
     printf("\n-- TestRemove --\n");
     sortedl_t* list = SortedLCreate(CompareInts);
     
@@ -77,11 +78,11 @@ void TestRemove()
     
     SortedLInsert(list, &a);
     SortedLInsert(list, &b);
-    it = SortedLInsert(list, &c);
-	SortedLInsert(list, &d);
-	    
-    SortedLRemove(it);
-    SortedLRemove(SortedLPrev(it));
+    it_c = SortedLInsert(list, &c);
+    it_d = SortedLInsert(list, &d);
+    
+    SortedLRemove(it_d);
+    SortedLRemove(it_c);
     
     SortedLForEach(SortedLBegin(list), SortedLEnd(list), ActionPrint, NULL);
     

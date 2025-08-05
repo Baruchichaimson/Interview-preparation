@@ -1,16 +1,24 @@
+# File: make/vector
+
 CC ?= gcc
-CFLAGS ?= -Wall -Wextra -std=c99 -I../inc -g
+CFLAGS ?= -Wall -Wextra -std=c99 -I$(HOME)/git/ds/inc -g
 
-SRC = ../src/vector.c ../test/vector_test.c
+SRC = $(HOME)/git/ds/src/vector.c $(HOME)/git/ds/test/vector_test.c
 
-TARGET = test_vector
+TARGET = $(HOME)/git/ds/bin/debug/vector_test
 
 all: $(TARGET)
 
 $(TARGET): $(SRC)
+	@echo "Compiling $@..."
 	$(CC) $(CFLAGS) $^ -o $@
+
+run: $(TARGET)
+	@echo "Running $@..."
+	$^
 
 clean:
 	rm -f $(TARGET) *.o
 
-.PHONY: all clean
+.PHONY: all clean run
+

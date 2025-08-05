@@ -14,12 +14,12 @@
 #define ISEND(iter) (IterToNode(iter)->next == NULL)
 #define ISBEGIN(iter) (IterToNode(iter)->prev == NULL)
 
-typedef struct node
+struct node
 {
     void* data;
     struct node* next;
     struct node* prev;
-} node_t;
+};
 
 struct dll
 {

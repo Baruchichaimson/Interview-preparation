@@ -12,7 +12,7 @@
 ***************************/
 
 
-#define DEFAULT_CAPACITY (8)
+#define DEFAULT_CAPACITY   (8)
 
 typedef struct Vector vector_t;
 

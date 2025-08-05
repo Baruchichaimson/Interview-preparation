@@ -10,7 +10,7 @@
 typedef struct VSA 
 {
 	void* end_pool;
-} vsa_t;
+}vsa_tt;
 
 typedef struct Header
 {
@@ -18,13 +18,13 @@ typedef struct Header
 	#ifndef NDEBUG
 		size_t magic_number;	
 	#endif
-} header_t;
+}header_t;
 
 #define ABS(x) ((x) < 0 ? -(x) : (x))
 
 int CountHeaders(vsa_t* vsa)
 {
-    header_t* curr = (header_t*)((char*)vsa + sizeof(vsa_t));
+    header_t* curr = (header_t*)((char*)vsa + sizeof(vsa_tt));
     int count = 0;
 
     while ((char*)curr < (char*)vsa->end_pool)

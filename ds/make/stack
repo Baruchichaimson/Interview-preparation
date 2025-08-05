@@ -1,16 +1,25 @@
+ROOT := $(HOME)/git/ds
+
 CC ?= gcc
-CFLAGS ?= -Wall -Wextra -std=c99 -I../inc -g
+CFLAGS ?= -Wall -Wextra -std=c99 -I$(ROOT)/inc -g
 
-SRC = ../src/stack.c ../test/stack_test.c
+SRC = $(ROOT)/src/stack.c $(ROOT)/test/stack_test.c
 
-TARGET = test_stack
+TARGET = $(ROOT)/bin/debug/stack_test
 
 all: $(TARGET)
 
 $(TARGET): $(SRC)
+	@echo "Compiling $@..."
 	$(CC) $(CFLAGS) $^ -o $@
 
-clean:
-	rm -f $(TARGET) *.o
+run: $(TARGET)
+	@echo "Running $@..."
+	$^
 
-.PHONY: all clean
+clean:
+	@echo "Cleaning $(TARGET)..."
+	rm -f $(TARGET)
+
+.PHONY: all clean run
+
