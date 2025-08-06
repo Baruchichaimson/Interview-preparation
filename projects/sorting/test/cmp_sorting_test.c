@@ -11,7 +11,7 @@
 #include <assert.h>
 #include <time.h>
 
-#include "sorting.h"
+#include "cmp_sorting.h"
 
 #define SIZE  (5000)
 

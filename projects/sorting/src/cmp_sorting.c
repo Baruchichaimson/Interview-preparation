@@ -1,5 +1,5 @@
 /************************************
- * Exercise: sorting (bubble, insertion, selection)
+ * Exercise: cmp_sorting (bubble, insertion, selection)
  * Date: 05/08/25
  * Developer: Baruch Haimson
  * Reviewer: guy
@@ -8,7 +8,7 @@
  
 #include <assert.h> /* assert */
 
-#include "sorting.h" /* API */
+#include "cmp_sorting.h" /* API */
 
 /******** helper function ************/
 
@@ -23,7 +23,6 @@ void SortingBubble(int* arr, size_t size)
 	int swaping = 0;
 	
 	assert(arr);
-	assert(size >= 2);
 	
 	for(i = 0; i < size - 1; i++)
 	{
@@ -50,7 +49,6 @@ void SortingInsertion(int* arr, size_t size)
     int key = 0;
 
     assert(arr);
-    assert(size >= 2);
 
     for (i = 1; i < size; ++i)
     {
@@ -73,7 +71,6 @@ void SortingSelection(int* arr, size_t size)
 	size_t min = 0;
 	
 	assert(arr);
-	assert(size >= 2);
 	
 	for (i = 0; i < size - 1; i++)
 	{
