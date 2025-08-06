@@ -1,3 +1,11 @@
+/************************************
+ * Exercise: linear sorting (counting, radix)
+ * Date: 06/08/25
+ * Developer: Baruch Haimson
+ * Reviewer: guy
+ * Status: 
+ ************************************/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>

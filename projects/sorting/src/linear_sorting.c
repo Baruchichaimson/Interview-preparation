@@ -1,9 +1,17 @@
+/************************************
+ * Exercise: linear sorting (counting, radix)
+ * Date: 06/08/25
+ * Developer: Baruch Haimson
+ * Reviewer: guy
+ * Status: 
+ ************************************/
+
 #include <assert.h> /* assert */
 #include <stdlib.h> /* size_t */
 #include <string.h> /* memcpy */
 #include <sys/types.h>  /* ssize_t */
 
-#include "linear_sorting.h"
+#include "linear_sorting.h" /* API */
 
 static void SortCountingByDigit(int* arr, size_t size, int digit);
 
