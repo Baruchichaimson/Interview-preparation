@@ -6,6 +6,8 @@
 
 static void swap(void* data1, void* data2);
 static bst_iter_t NodeToIter(bst_node_t* node);
+static bst_node_t* CreateNode(void* data);
+
 
 typedef enum child_node_pos
 {
@@ -41,7 +43,7 @@ bst_t* BSTCreate(cmp_func_t cmp)
 
     tree->root_stub.parent = NULL;
     tree->root_stub.children[LEFT] = NULL;
-    tree->root_stub.children[RIGHT] = NULL;
+    tree->root_stub.children[RIGHT] = &tree->root_stub;
     tree->root_stub.data = NULL;
     tree->cmp = cmp;
 
@@ -94,17 +96,13 @@ bst_iter_t BSTInsert(bst_t* tree, void* data)
     assert(tree);
     assert(data);
 
-    new_node = (bst_node_t*)malloc(sizeof(bst_node_t));
+    new_node = CreateNode(data);
     if (!new_node)
     {
         return NodeToIter(NULL);
     }
 
-    new_node->data = data;
-    new_node->children[LEFT] = NULL;
-    new_node->children[RIGHT] = NULL;
-
-    if (current == NULL)
+    if (BSTIsEmpty(tree))
     {
         tree->root_stub.children[LEFT] = new_node;
         new_node->parent = &tree->root_stub;
@@ -115,26 +113,12 @@ bst_iter_t BSTInsert(bst_t* tree, void* data)
     {
         parent = current;
 
-        if (tree->cmp(data, current->data) < 0)
-        {
-            current = current->children[LEFT];
-        }
-        else
-        {
-            current = current->children[RIGHT];
-        }
+        current = current->children[tree->cmp(data, current->data) > 0];
     }
 
     new_node->parent = parent;
 
-    if (tree->cmp(data, parent->data) < 0)
-    {
-        parent->children[LEFT] = new_node;
-    }
-    else
-    {
-        parent->children[RIGHT] = new_node;
-    }
+    parent->children[tree->cmp(data, parent->data) > 0] = new_node;
 
     return NodeToIter(new_node);
 }
@@ -146,16 +130,6 @@ void BSTRemove(bst_iter_t to_remove)
     assert(to_remove.node);
 
     if (to_remove.node->children[LEFT] && to_remove.node->children[RIGHT])
-    {
-        successor = BSTNext(to_remove);
-        swap(to_remove.node->data, successor.node->data);
-    }
-    else if (to_remove.node->children[RIGHT])
-    {
-        successor = BSTNext(to_remove);
-        swap(to_remove.node->data, successor.node->data);
-    }
-    else if (to_remove.node->children[LEFT])
     {
         successor = BSTNext(to_remove);
         swap(to_remove.node->data, successor.node->data);
@@ -202,7 +176,7 @@ int BSTIsEmpty(const bst_t* tree)
 
 bst_iter_t BSTBegin(const bst_t* tree)
 {
-    bst_node_t* current = tree->root_stub.children[LEFT];
+    bst_node_t* current = tree->root_stub.children[RIGHT];
 
     assert(tree);
 
@@ -320,6 +294,25 @@ int BSTForEach(bst_iter_t from, bst_iter_t to, int(*action_func)(void* data, voi
 
     return 0;
 }
+
+static bst_node_t* CreateNode(void* data)
+{
+    bst_node_t* node = NULL;
+
+    node = (bst_node_t*)malloc(sizeof(bst_node_t));
+    if (!node)
+    {
+        return NULL;
+    }
+
+    node->data = data;
+    node->children[LEFT] = NULL;
+    node->children[RIGHT] = NULL;
+    node->parent = NULL;
+
+    return node;
+}
+
 
 static bst_iter_t NodeToIter(bst_node_t* node)
 {
