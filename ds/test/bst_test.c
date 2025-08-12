@@ -1,4 +1,4 @@
-#include <stdio.h>
+/*#include <stdio.h>
 
 #include "bst.h"
 
@@ -317,5 +317,289 @@ int main()
     TestRemoveBST();
 
     return 0;
+}*/
+
+#include <stdio.h>
+#include <assert.h>
+#include <time.h>   /* rime */ 
+#include "bst.h"
+
+#define GREEN "\033[1;32m"
+#define RED "\033[1;31m"
+#define BOLD "\033[1m"
+#define RESET "\033[0m"
+#define MIN(a,b)		(((a) > (b)) ? (b) : (a))
+#define SIZE	(200)
+struct bst_node
+{
+    bst_node_t* parent;
+    bst_node_t* children[2];
+    void* data;
+};
+
+struct bst
+{
+    bst_node_t root_stub;    
+    cmp_func_t cmp;
+};
+
+/* global vars */
+static int global_result = 1;
+static int current_test = 1; 
+static char* TestPrintStr = "";
+static int arr[10] = {0,10,20,30,40,50,60,70,80,90};
+static int arr_rand[SIZE] = {0};
+
+/* helper funcs */
+static int PrintResults(int result, char* test_info);
+static void PrintTestResults(void);
+
+/* action funcs */
+static int CmpInts(const void* data1, const void* data2);
+static int IsTreeLegit(bst_t* tree);
+static int ActionPrintInt(void* data, void* param);
+static int ActionAddInt(void* data, void* param);
+
+/* test funcs */
+static void Test1(void);
+static void Test2(void);
+static void Test3(void);
+static void Test4(void);
+
+
+int main()
+{
+	srand(time(NULL));
+	Test1();
+	Test2();
+	Test3();
+	Test4();
+	
+	PrintResults(global_result," ALL TESTS");
+
+	return 0;
 }
+/****************************************/
+/*	STATIC TEST FUNCS		*/
+/****************************************/
+
+static void Test4(void)
+{
+	bst_t* bst = BSTCreate(&CmpInts);		
+	bst_iter_t iter = {NULL};
+	size_t i = 0;
+	size_t j = 0;
+	size_t k = 0;
+	size_t next = 0;
+	current_test = 1;
+	
+	printf("#### TEST 4\n");
+	TestPrintStr = "TEST 4";
+	for (k = 0; k < 10; ++k)
+	{
+		for (i = 0; i < SIZE; ++i)
+		{
+			arr_rand[i] = rand();
+			BSTInsert(bst,arr_rand + i);
+		}
+		
+		BSTRemove(BSTPrev(BSTEnd(bst)));
+		BSTRemove(BSTBegin(bst));
+		
+		for (i = 0; i < SIZE -2; ++i)
+		{
+			if (i % 10 == 0)
+			{
+				current_test = MIN(current_test, IsTreeLegit(bst));
+			}
+			
+			iter = BSTBegin(bst);
+			next = rand() % (SIZE - i - 2);
+			for (j = 0; j < next; ++j)
+			{
+				iter = BSTNext(iter);
+			}
+			
+			BSTRemove(iter);
+		}
+	}
+			
+	PrintResults(BSTIsEmpty(bst),"empty tree");
+	PrintResults(current_test, "Tree was ordered all the way");
+	BSTDestroy(bst);
+	
+	PrintTestResults();
+}
+
+
+static void Test3(void)
+{
+	bst_t* bst = BSTCreate(&CmpInts);	
+	bst_iter_t iter = BSTBegin(bst);
+	int x = 2;
+	current_test = 1;
+	
+	printf("#### TEST 3\n");
+	TestPrintStr = "TEST 3";
+	printf("inserting 10 elements...\n");
+	
+	BSTInsert(bst, arr+1);
+	BSTInsert(bst, arr);
+	BSTInsert(bst, arr+6);
+	BSTInsert(bst, arr+2);
+	BSTInsert(bst, arr+5);
+	BSTInsert(bst, arr+3);
+	BSTInsert(bst, arr+4);
+	BSTInsert(bst, arr+8);
+	BSTInsert(bst, arr+7);
+	BSTInsert(bst, arr+9);
+	
+	PrintResults(IsTreeLegit(bst), "tree is ordered");
+	printf("printing tree:\n");
+	BSTForEach(BSTBegin(bst), BSTEnd(bst), &ActionPrintInt, "before");
+	BSTForEach(BSTBegin(bst), BSTEnd(bst), &ActionAddInt, &x);	
+	printf("\n");
+	BSTForEach(BSTBegin(bst), BSTEnd(bst), &ActionPrintInt, "after");
+
+	printf("removing...\n");
+	
+	iter = BSTBegin(bst);
+	iter = BSTNext(BSTNext(BSTNext(iter)));
+	BSTRemove(iter);
+	PrintResults(IsTreeLegit(bst), "removed a node");
+
+	iter = BSTBegin(bst);
+	iter = BSTNext(iter);
+	BSTRemove(iter);
+	PrintResults(IsTreeLegit(bst), "removed a node");
+
+	BSTForEach(BSTBegin(bst), BSTEnd(bst), &ActionPrintInt, "");
+	PrintResults(BSTSize(bst), "size = 8");
+	
+	BSTDestroy(bst);
+
+	PrintResults(1, "destroyed (check vlg)");	
+	
+	PrintTestResults();
+}
+
+
+static void Test2(void)
+{
+	bst_t* bst = BSTCreate(&CmpInts);	
+	bst_iter_t iter = BSTBegin(bst);
+	current_test = 1;
+	printf("#### TEST 2\n");
+	TestPrintStr = "TEST 2";
+	
+	iter = BSTInsert(bst, arr+1);
+	iter = BSTInsert(bst, arr);
+	
+	PrintResults(arr == BSTGetData(iter), "new node inserted");	
+	PrintResults(!BSTIsEmpty(bst), "!IsEmpty");
+	PrintResults((2 == BSTSize(bst)), "size = 2");
+	PrintResults(BSTIterIsSame(iter, BSTFind(bst,arr)), "found: arr ");
+	
+	BSTDestroy(bst);
+
+	PrintResults(1, "destroyed (check vlg)");	
+	
+	PrintTestResults();
+}
+
+static void Test1(void)
+{
+	bst_t* bst = BSTCreate(&CmpInts);		
+	current_test = 1;
+	printf("#### TEST 1\n");
+	TestPrintStr = "TEST 1";
+	
+	PrintResults((NULL != bst), "creating a bst!");
+	PrintResults(BSTIsEmpty(bst), "IsEmpty");
+	PrintResults((0 == BSTSize(bst)), "size = 0");
+	
+	BSTDestroy(bst);
+	
+	PrintTestResults();
+}
+
+/****************************************/
+/*	STATIC HELPER FUNCS		*/
+/****************************************/
+
+static void PrintTestResults(void)
+{
+	if (current_test)
+	{
+		printf(GREEN"============ PASSED ALL TEST IN %s ============"RESET"\n\n", TestPrintStr);
+	}
+	else
+	{
+		printf(RED"============ FAILED SOME TEST IN %s ============"RESET"\n\n", TestPrintStr);	
+	}
+}
+
+static int PrintResults(int result, char* test_info)
+{
+	if (result)
+	{
+		printf(GREEN"Passed %s"RESET"\n",test_info);
+	}
+	else
+	{
+		global_result = 0;
+		current_test = 0;
+		printf(RED"Failed %s"RESET"\n",test_info);		
+	}
+	
+	return result;
+}
+
+static int CmpInts(const void* data1, const void* data2)
+{
+	assert(data1);
+	assert(data2);
+	
+	return *(int*)data1 - *(int*)data2;
+}
+
+static int ActionPrintInt(void* data, void* param)
+{
+	assert(data);
+	assert(param);
+	
+	printf("%d %s\n", *(int*)data, (char*)param);
+	return 0;
+}
+
+static int ActionAddInt(void* data, void* param)
+{
+	*(int*)data += *(int*)param;
+	return 0;
+}
+
+static int IsTreeLegit(bst_t* tree)
+{
+	bst_iter_t iter = {NULL};
+	bst_iter_t next = {NULL}; 
+	
+	assert(tree);
+
+	iter = BSTBegin(tree);
+	
+	while ((NULL != iter.node->parent) && (NULL != (BSTNext(iter)).node->parent))
+	{
+		next = BSTNext(iter);
+		
+		if (0 < tree->cmp(iter.node->data, next.node->data))
+		{
+			return 0;
+		}
+		
+		iter = next;
+	}
+	
+	return 1;
+}
+
 
