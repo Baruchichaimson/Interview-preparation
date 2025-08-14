@@ -10,7 +10,7 @@ Status: Developing
 #include <stdlib.h> /* malloc, free */
 #include <assert.h> /* assert */ 
 
-#include "bst.h" /* API */
+#include "bst.h" /* bst_iter_t */
 
 /******************** helper functions ********************/
 
@@ -106,6 +106,8 @@ bst_iter_t BSTInsert(bst_t* tree, void* data)
     bst_node_t* parent = &tree->root_stub;
     bst_node_t* current = tree->root_stub.children[LEFT];
 
+    int status = 0;
+
     assert(tree);
     assert(data);
 
@@ -126,7 +128,11 @@ bst_iter_t BSTInsert(bst_t* tree, void* data)
     {
         parent = current;
 
-        current = current->children[tree->cmp(data, current->data) > 0];
+        status = tree->cmp(data, current->data);
+
+        assert(status);
+
+        current = current->children[status > 0];
     }
 
     new_node->parent = parent;
@@ -138,40 +144,44 @@ bst_iter_t BSTInsert(bst_t* tree, void* data)
 
 void BSTRemove(bst_iter_t to_remove)
 {
-    bst_iter_t successor = {NULL};
+    bst_iter_t target = to_remove;
     bst_node_t *parent = NULL;
+    bst_node_t *child = NULL;
 
     assert(to_remove.node);
+
     if (IsEnd(to_remove))
     {
-        return; 
+        return;
     }
 
     if (to_remove.node->children[LEFT] && to_remove.node->children[RIGHT])
     {
-        successor = BSTNext(to_remove);
+        bst_iter_t successor = BSTNext(to_remove);
         swap(to_remove.node->data, successor.node->data);
+        target = successor; 
+    }
+
+    child = target.node->children[LEFT] ? target.node->children[LEFT] : target.node->children[RIGHT];
+    parent = target.node->parent;
+
+    if (parent->children[LEFT] == target.node)
+    {
+        parent->children[LEFT] = child;
     }
     else
     {
-        successor = to_remove; 
+        parent->children[RIGHT] = child;
     }
 
-    parent = successor.node->parent;
-    if(parent)
+    if (child)
     {
-        if (parent->children[LEFT] == successor.node)
-        {
-            parent->children[LEFT] = NULL;
-        }
-        else if (parent->children[RIGHT] == successor.node)
-        {
-            parent->children[RIGHT] = NULL;
-        }
+        child->parent = parent;
     }
-   
-    free(successor.node);   
+
+    free(target.node);
 }
+
 
 size_t BSTSize(const bst_t* tree)
 {   
