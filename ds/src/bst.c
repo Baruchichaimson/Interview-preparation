@@ -145,6 +145,7 @@ bst_iter_t BSTInsert(bst_t* tree, void* data)
 void BSTRemove(bst_iter_t to_remove)
 {
     bst_iter_t target = to_remove;
+    bst_iter_t successor = {NULL};
     bst_node_t *parent = NULL;
     bst_node_t *child = NULL;
 
@@ -157,7 +158,7 @@ void BSTRemove(bst_iter_t to_remove)
 
     if (to_remove.node->children[LEFT] && to_remove.node->children[RIGHT])
     {
-        bst_iter_t successor = BSTNext(to_remove);
+        successor = BSTNext(to_remove);
         swap(to_remove.node->data, successor.node->data);
         target = successor; 
     }
