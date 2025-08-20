@@ -329,5 +329,21 @@ int main(void)
         printf("Arithmetic error in expression\n");
     }
 
+    /* ========== TEST 20 =======================*/
+
+    printf("test 19: 8 */ 4 \n\n");
+
+    if (Calculator("8 */ 4", &res) == SUCCESS)
+    {
+        printf("Result: %f\n", res);
+    }
+    else if(Calculator("8 */ 4", &res) == SYNTAX_ERROR)
+    {
+        printf("Syntax error in expression\n");
+    }
+    else if(Calculator("8 */ 4", &res) == MATH_ERROR)
+    {
+        printf("Arithmetic error in expression\n");
+    }
     return 0;
 }

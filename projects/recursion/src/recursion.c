@@ -26,7 +26,7 @@ int FibonacciRec(size_t n)
         return 1; 
     }
 
-    return FibonacciMemo(n - 1) + FibonacciMemo(n - 2);
+    return FibonacciRec(n - 1) + FibonacciRec(n - 2);
 }
 int FibonacciMemo(size_t n)   
 {
@@ -194,3 +194,5 @@ void SortStack(stack_t* s)
         InsertSorted(s, top);
     }
 }
+
+
