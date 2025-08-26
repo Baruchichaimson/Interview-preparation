@@ -98,7 +98,7 @@ void HeapPop(heap_t* heap)
     }
 }
 
-void HeapRemove(heap_t* heap, const void* data, is_match_func func)
+void* HeapRemove(heap_t* heap, const void* data, is_match_func func)
 {
     size_t i = 0;
     void **curr = NULL;
