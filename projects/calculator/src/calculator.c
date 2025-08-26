@@ -6,7 +6,7 @@
  * Status: In Progress
  ************************************/
 
-#include <stdlib.h> /* malloc, free */
+#include <stdlib.h> /* malloc */
 #include <string.h> /* strlen */
 #include <assert.h> /* assert */
 #include <math.h> /* pow */
@@ -215,6 +215,7 @@ static void InitALL(void)
 static void NumPush(stack_t *s, double v)
 {
     assert(s);
+
     assert(StackSize(s) != StackCapacity(s));
 
     StackPush(s, &v);
@@ -340,16 +341,8 @@ static calculator_status_e HandleLparen(calc_data_t* calc)
 
 static calculator_status_e HandleRparen(calc_data_t* calc)
 {
-    char lparen = 0;
-
-    lparen = matching_paren[(unsigned char)*calc->p];
-
-    while (calc->status == SUCCESS && StackSize(calc->ops) > 0 && OpPeek(calc->ops) != lparen)
+    while (calc->status == SUCCESS && StackSize(calc->ops) > 0 && OpPeek(calc->ops) != matching_paren[(unsigned char)OpPeek(calc->ops)])
     {
-        if (matching_paren[(unsigned char)OpPeek(calc->ops)] == OpPeek(calc->ops))
-        {
-            return SYNTAX_ERROR;
-        }
         ApplyTop(calc);    
     }
     
