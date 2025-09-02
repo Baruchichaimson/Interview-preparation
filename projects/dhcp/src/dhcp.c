@@ -55,15 +55,30 @@ dhcp_t* DHCPCreate(const unsigned char netip[BYTES_IN_IPV4], size_t mask)
     dhcp->net_ip = NetworkAddress(BytesToUInt(netip), mask);
     
     /* Reserve network address (0) */
-    TrieInsert(dhcp->trie, 0, &dummy);
+    if (!TrieInsert(dhcp->trie, 0, &dummy))
+    {
+        TrieDestroy(dhcp->trie);
+        free(dhcp);
+        return NULL;
+    }
     
     broadcast_host = (1U << subnet_bits) - 1;
 
     /* Reserve second-to-last address (254 for /24) */
-    TrieInsert(dhcp->trie, broadcast_host - 1, &dummy);
+    if (!TrieInsert(dhcp->trie, broadcast_host - 1, &dummy))
+    {
+        TrieDestroy(dhcp->trie);
+        free(dhcp);
+        return NULL;
+    }
     
     /* Reserve broadcast address (255 for /24) */
-    TrieInsert(dhcp->trie, broadcast_host, &dummy);
+    if (!TrieInsert(dhcp->trie, broadcast_host, &dummy))
+    {
+        TrieDestroy(dhcp->trie);
+        free(dhcp);
+        return NULL;
+    }
     
     return dhcp;
 }
@@ -76,7 +91,7 @@ void DHCPDestroy(dhcp_t* dhcp)
     free(dhcp);
 }
 
-dhcp_status_e DHCPAllocateIP(dhcp_t* dhcp, unsigned char allocated_ip[BYTES_IN_IPV4], const unsigned char requested_ip[BYTES_IN_IPV4])
+/*dhcp_status_e DHCPAllocateIP(dhcp_t* dhcp, unsigned char allocated_ip[BYTES_IN_IPV4], const unsigned char requested_ip[BYTES_IN_IPV4])
 {
     unsigned int subnet_bits = 0;
     unsigned int broadcast_host = 0;
@@ -85,7 +100,7 @@ dhcp_status_e DHCPAllocateIP(dhcp_t* dhcp, unsigned char allocated_ip[BYTES_IN_I
     unsigned int req_ip = 0;
     unsigned int netaddr = 0;
     int is_zero_request = 0;
-    /*unsigned int i = 1;*/
+    unsigned int i = 1;
     unsigned char zero[BYTES_IN_IPV4] = {0, 0, 0, 0};
 
     assert(dhcp);
@@ -145,7 +160,7 @@ dhcp_status_e DHCPAllocateIP(dhcp_t* dhcp, unsigned char allocated_ip[BYTES_IN_I
         }
     }
     
-    /*host_part = req_ip & broadcast_host;
+    host_part = req_ip & broadcast_host;
     for (i = 1; i < host_part; ++i)
     {
         if (TrieInsert(dhcp->trie, i, &alloc_host))
@@ -153,8 +168,74 @@ dhcp_status_e DHCPAllocateIP(dhcp_t* dhcp, unsigned char allocated_ip[BYTES_IN_I
             UIntToBytes(dhcp->net_ip | i, allocated_ip);
             return IP_OCCUPIED_ALLOCATED_ANOTHER;
         }
-    }*/
+    }
     
+    return NO_IP_AVAILABLE;
+}*/
+
+dhcp_status_e DHCPAllocateIP(dhcp_t* dhcp,
+                             unsigned char allocated_ip[BYTES_IN_IPV4],
+                             const unsigned char requested_ip[BYTES_IN_IPV4])
+{
+    unsigned int subnet_bits = 0;
+    unsigned int broadcast_host = 0;
+    unsigned int host_part = 0;
+    unsigned int alloc_host = 0;
+    unsigned int req_ip = 0;
+    unsigned int netaddr = 0;
+    int is_zero_request = 0;
+    unsigned char zero[BYTES_IN_IPV4] = {0, 0, 0, 0};
+
+    assert(dhcp);
+
+    subnet_bits = BITS - dhcp->mask;
+    broadcast_host = (1U << subnet_bits) - 1;
+    
+    is_zero_request = (memcmp(requested_ip, zero, BYTES_IN_IPV4) == 0);
+    
+    if (is_zero_request)
+    {
+        if (TrieInsert(dhcp->trie, 1, &alloc_host))
+        {
+            UIntToBytes(dhcp->net_ip | alloc_host, allocated_ip);
+            return SUCCESS;
+        }
+        return NO_IP_AVAILABLE;
+    }
+    
+    req_ip = BytesToUInt(requested_ip);
+    netaddr = NetworkAddress(req_ip, dhcp->mask);
+    host_part = req_ip & broadcast_host;
+    
+    if (netaddr != dhcp->net_ip)
+    {
+        return NO_IP_AVAILABLE;
+    }
+    
+    if (host_part == 0 || host_part == broadcast_host - 1 || host_part == broadcast_host)
+    {
+        if (TrieInsert(dhcp->trie, 1, &alloc_host))
+        {
+            UIntToBytes(dhcp->net_ip | alloc_host, allocated_ip);
+            return IP_OCCUPIED_ALLOCATED_ANOTHER;
+        }
+        return NO_IP_AVAILABLE;
+    }
+    
+    if (TrieInsert(dhcp->trie, host_part, &alloc_host))
+    {
+        UIntToBytes(dhcp->net_ip | alloc_host, allocated_ip);
+        return (alloc_host == host_part) ? SUCCESS : IP_OCCUPIED_ALLOCATED_ANOTHER;
+    }
+
+    alloc_host = TrieNextFree(dhcp->trie, host_part + 1);
+    if (alloc_host)
+    {
+        TrieInsert(dhcp->trie, alloc_host, &alloc_host);
+        UIntToBytes(dhcp->net_ip | alloc_host, allocated_ip);
+        return IP_OCCUPIED_ALLOCATED_ANOTHER;
+    }
+
     return NO_IP_AVAILABLE;
 }
 

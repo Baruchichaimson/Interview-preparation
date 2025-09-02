@@ -183,7 +183,7 @@ static void UpdateNode(trie_node_t* node, int depth, int max_depth)
     }
 }
 
-static int TrieInsertRec(trie_node_t *node, unsigned int ip, int depth, unsigned int *allocated_ip, int max_depth) 
+/*static int TrieInsertRec(trie_node_t *node, unsigned int ip, int depth, unsigned int *allocated_ip, int max_depth) 
 {
     int bit = 0;
     
@@ -219,6 +219,65 @@ static int TrieInsertRec(trie_node_t *node, unsigned int ip, int depth, unsigned
     }
 
     return 0;
+}*/
+
+static int TrieInsertRec(trie_node_t *node, unsigned int ip, int depth,
+                         unsigned int *allocated_ip, int max_depth) 
+{
+    int bit = 0;
+    int other = 0;
+    if (node->is_full) 
+    {
+        return 0; 
+    }
+
+    if (depth == max_depth) 
+    {
+        if (!node->is_full) 
+        {
+            node->is_full = 1;
+            node->free_count = 0;
+            *allocated_ip = ip;
+            return 1;
+        }
+        return 0;
+    }
+
+    bit = (ip >> (max_depth - 1 - depth)) & 1;
+
+    if (!node->children[bit]) 
+    {
+        node->children[bit] = NodeCreate(depth + 1, max_depth);
+        if (!node->children[bit]) 
+        {
+            return 0;
+        }
+    }
+
+    if (TrieInsertRec(node->children[bit], ip, depth + 1, allocated_ip, max_depth)) 
+    {
+        UpdateNode(node, depth, max_depth);
+        return 1;
+    }
+
+    other = 1 - bit;
+    if (!node->children[other]) 
+    {
+        node->children[other] = NodeCreate(depth + 1, max_depth);
+        if (!node->children[other]) 
+        {
+            return 0;
+        }
+    }
+
+    if (TrieInsertRec(node->children[other], ip & ~(1U << (max_depth - 1 - depth)),
+                      depth + 1, allocated_ip, max_depth)) 
+    {
+        UpdateNode(node, depth, max_depth);
+        return 1;
+    }
+
+    return 0;
 }
 
 static int TrieRemoveRec(trie_node_t *node, unsigned int ip, int depth, int max_depth) 
@@ -235,11 +294,13 @@ static int TrieRemoveRec(trie_node_t *node, unsigned int ip, int depth, int max_
     {
         if (node->is_full) 
         {
-            node->is_full = 0;
-            node->free_count = 1;
-            return 1;
+            free(node);
+            return 2; 
         }
-        return 0;  
+        else 
+        {
+            return 0;  /* IP was not allocated - double free */
+        }        
     }
 
     bit = (ip >> (max_depth - 1 - depth)) & 1;
@@ -250,6 +311,13 @@ static int TrieRemoveRec(trie_node_t *node, unsigned int ip, int depth, int max_
     }
 
     removed = TrieRemoveRec(node->children[bit], ip, depth + 1, max_depth);
+
+    if (removed == 2) 
+    {
+        /* child was freed */
+        node->children[bit] = NULL;
+        removed = 1;
+    }
 
     if (removed) 
     {
