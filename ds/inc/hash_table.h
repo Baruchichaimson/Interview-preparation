@@ -10,7 +10,7 @@ typedef size_t (*hash_func_t)(const void* data);
 
 typedef struct hash_table hash_table_t;
 
- struct hash_table
+struct hash_table
 {
     size_t capacity;
     hash_func_t hash_func;

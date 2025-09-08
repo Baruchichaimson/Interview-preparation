@@ -14,8 +14,8 @@ int main()
     char cmd[MAX_CMD] = { 0 };
     int use_system = 0;
 
-    printf("Use system() instead of fork? (1=yes, 0=no): ");
-    scanf("%d", &use_system);
+    printf("Use system() instead of fork? (1 = yes, 0 = no): ");
+    scanf("%d", &use_system);   
     getchar(); 
 
     while (1) 
@@ -32,6 +32,8 @@ int main()
         {
             break;
         }
+        
+        
 
         if (use_system) 
         {
@@ -64,6 +66,7 @@ int main()
                     perror("waitpid");
                 }
             }
+        
         }
     }
     printf("Exiting shell.\n");
