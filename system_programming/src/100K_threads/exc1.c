@@ -1,23 +1,16 @@
-/* threads_write.c
- *
- * Create 100,000 threads. Each thread writes its index into a global array.
- * Main measures spawn time and then sleeps 10 seconds before verifying.
- *
- * Compile: gcc -O3 -pthread threads_write.c -o threads_write
- */
-
 #define _POSIX_C_SOURCE 200809L
-#include <stdio.h>
-#include <stdlib.h>
-#include <pthread.h>
-#include <time.h>
-#include <unistd.h>
+
+#include <stdio.h> /* printf */
+#include <stdlib.h> /* malloc */
+#include <pthread.h> /* pthread_t */
+#include <time.h> /* clock_gettime */
+#include <unistd.h> /* sleep */
 
 #define N 1000000
 
 int *g_array;
 
-void *worker(void *arg) 
+static void *worker(void *arg) 
 {
     int idx = *(int *)arg;
     g_array[idx] = idx;
@@ -25,7 +18,7 @@ void *worker(void *arg)
     return NULL;
 }
 
-static inline long timespec_diff_ns(const struct timespec *a, const struct timespec *b) 
+static long timespec_diff_ns(const struct timespec *a, const struct timespec *b) 
 {
     long sec = b->tv_sec - a->tv_sec;
     long nsec = b->tv_nsec - a->tv_nsec;

@@ -1,18 +1,13 @@
 #define _POSIX_C_SOURCE 200809L
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <signal.h>
-#include <sys/wait.h>
-#include <string.h>
-
-pid_t child_pid;
-pid_t parent_pid;
+#include <stdio.h>    /* printf, perror */
+#include <stdlib.h>   /* exit, EXIT_FAILURE */
+#include <unistd.h>   /* fork, getpid, pause, sleep */
+#include <signal.h>   /* sigaction, kill, SIGUSR1, SIGUSR2 */
 
 volatile sig_atomic_t got_signal = 0;
 
-void handler(int sig) 
+static void handler(int sig) 
 {
     got_signal = sig;
 }
@@ -20,15 +15,24 @@ void handler(int sig)
 int main() 
 {
     int time = 5;
-
+    pid_t child_pid;
+    pid_t parent_pid;
     struct sigaction sa;
 
     sa.sa_handler = handler;
     sigemptyset(&sa.sa_mask);
     sa.sa_flags = 0;
 
-    sigaction(SIGUSR1, &sa, NULL);
-    sigaction(SIGUSR2, &sa, NULL);
+    if (sigaction(SIGUSR1, &sa, NULL) == -1) 
+    {
+        perror("sigaction");
+        exit(EXIT_FAILURE);
+    }
+    if (sigaction(SIGUSR2, &sa, NULL) == -1) 
+    {
+        perror("sigaction");
+        exit(EXIT_FAILURE);
+    }
 
     parent_pid = getpid();
 
@@ -57,7 +61,11 @@ int main()
     {
         sleep(1); 
         printf("Parent sending SIGUSR1 to child\n");
-        kill(child_pid, SIGUSR1);
+        if (kill(child_pid, SIGUSR1) == -1) 
+        {
+            perror("kill");
+            exit(EXIT_FAILURE);
+        }
 
         while (time) 
         {

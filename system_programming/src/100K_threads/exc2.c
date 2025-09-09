@@ -1,23 +1,16 @@
-/* threads_write.c
- *
- * Create 100,000 threads. Each thread writes its index into a global array.
- * Main measures spawn time and then sleeps 10 seconds before verifying.
- *
- * Compile: gcc -O3 -pthread threads_write.c -o threads_write
- */
-
 #define _POSIX_C_SOURCE 200809L
-#include <stdio.h>
-#include <stdlib.h>
-#include <pthread.h>
-#include <time.h>
-#include <unistd.h>
+
+#include <stdio.h> /* printf */
+#include <stdlib.h> /* malloc */
+#include <pthread.h> /* pthread_t */
+#include <time.h> /* clock_gettime */
+#include <unistd.h> /* sleep */
 
 #define N 1000000
 
 int *g_array;
 
-void *worker(void *arg) 
+static void *worker(void *arg) 
 {
     int idx = *(int *)arg;
     g_array[idx] = idx;
@@ -36,6 +29,7 @@ static inline long timespec_diff_ns(const struct timespec *a, const struct times
 int main(void) 
 {
     int i = 0;
+    int ret = 0;
     long ns = 0;
     double ms = 0;
     pthread_t th;
@@ -44,7 +38,6 @@ int main(void)
     struct timespec tstart;
     struct timespec tend;
     int *indices = NULL;
-    unsigned long long create_failures = 0ULL; 
 
     g_array = malloc(sizeof(int) * N);
     if (!g_array) 
@@ -74,25 +67,15 @@ int main(void)
 
     for (i = 0; i < N; ++i) 
     {
-        int rc;
-        int backoff_us = 100;    
-        const int max_backoff_us = 100000;
-        while ((rc = pthread_create(&th, NULL, worker, &indices[i])) != 0) 
+        do 
         {
-            ++create_failures;
-    
-            if (backoff_us > max_backoff_us) 
+            ret = pthread_create(&th, NULL, worker, &indices[i]);
+            if (ret != 0) 
             {
-                backoff_us = max_backoff_us;
+                sleep(100); 
             }
-            sleep((useconds_t)backoff_us);
+        } while (ret != 0);
 
-            if (backoff_us < max_backoff_us) 
-            {
-                backoff_us *= 2;
-            }
-           
-        }
         pthread_detach(th);
     }
 

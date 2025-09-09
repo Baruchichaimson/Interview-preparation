@@ -44,15 +44,12 @@ int main(int argc, char* argv[])
     kill(ping_pid, SIGUSR1);
 
     while (time(NULL) - start < 20)
-	{
-        while (!got_signal && time(NULL) - start < 20)
-        {
-            pause();
-            sleep(1);
-            printf("Pong received SIGUSR2, sending SIGUSR1\n");
-            got_signal = 0;
-            kill(ping_pid, SIGUSR1);
-        }
+    {
+        pause(); 
+        sleep(1);
+        printf("Pong received SIGUSR2, sending SIGUSR1\n");
+        got_signal = 0;
+        kill(ping_pid, SIGUSR1);
     }
     kill(ping_pid, SIGTERM);	
     return 0;
