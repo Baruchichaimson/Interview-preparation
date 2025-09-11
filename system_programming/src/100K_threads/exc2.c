@@ -1,3 +1,11 @@
+/**************************************
+Exercise: milion threads
+Date: 11/09/2025
+Developer: Baruchi haimson
+Reviewer: Tamar
+Status: Approved
+**************************************/
+
 #define _POSIX_C_SOURCE 200809L
 
 #include <stdio.h> /* printf */

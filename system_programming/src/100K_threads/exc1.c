@@ -1,3 +1,11 @@
+/**************************************
+Exercise: milion threads
+Date: 11/09/2025
+Developer: Baruchi haimson
+Reviewer: Tamar
+Status: Approved
+**************************************/
+
 #define _POSIX_C_SOURCE 200809L
 
 #include <stdio.h> /* printf */
@@ -6,7 +14,7 @@
 #include <time.h> /* clock_gettime */
 #include <unistd.h> /* sleep */
 
-#define N 1000000
+#define N (1000000)
 
 int *g_array;
 
@@ -18,7 +26,7 @@ static void *worker(void *arg)
     return NULL;
 }
 
-static long timespec_diff_ns(const struct timespec *a, const struct timespec *b) 
+static long timespec_diff_ns(const struct timespec* a, const struct timespec* b) 
 {
     long sec = b->tv_sec - a->tv_sec;
     long nsec = b->tv_nsec - a->tv_nsec;
@@ -36,7 +44,7 @@ int main(void)
     int printed = 0;
     struct timespec tstart;
     struct timespec tend;
-    int *indices = NULL;
+    int* indices = NULL;
 
     g_array = malloc(sizeof(int) * N);
     if (!g_array) 
@@ -93,7 +101,7 @@ int main(void)
     } 
     else 
     {
-        printf("Verification failed: %zu incorrect entries out of %d.\n", bad, N);
+        printf("Verification failed: %lu incorrect entries out of %d.\n", bad, N);
         
         for (i = 0; i < N && printed < 10; ++i) 
         {

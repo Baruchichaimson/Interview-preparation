@@ -1,12 +1,20 @@
+/**************************************
+Exercise: milion threads
+Date: 11/09/2025
+Developer: Baruchi haimson
+Reviewer: Tamar
+Status: Approved
+**************************************/
+
 #define _POSIX_C_SOURCE 200809L
 
 #include <stdio.h> /* printf */
-#include <omp.h> /* omp_get_wtime */
+#include <omp.h>  /* omp_get_wtime */
 
-static long sum_divisors(long long n) 
+static long sum_divisors(size_t n) 
 {
-    long long sum = 0;
-    long long i = 0;
+    size_t sum = 0;
+    size_t i = 0;
 
     for (i = 1; i * i <= n; i++) 
     {
@@ -24,10 +32,10 @@ static long sum_divisors(long long n)
 
 int main(void) 
 {
-    long long i = 0;
+    size_t i = 0;
     double tend = 0;
-    long long number = 1000000LL; 
-    long long total_sum = 0;
+    size_t number = 1000000LL; 
+    size_t total_sum = 0;
 
     double tstart = omp_get_wtime();  
 
@@ -39,8 +47,9 @@ int main(void)
 
     tend = omp_get_wtime();  
 
-    printf("OpenMP: Sum of divisors from 1 to %lld = %lld\n", number, total_sum);
+    printf("OpenMP: Sum of divisors from 1 to %ld = %ld\n", number, total_sum);
     printf("Time taken with OpenMP: %.6f seconds\n", tend - tstart);
 
     return 0;
 }
+

@@ -1,3 +1,11 @@
+/**************************************
+Exercise: milion threads
+Date: 11/09/2025
+Developer: Baruchi haimson
+Reviewer: Tamar
+Status: Approved
+**************************************/
+
 #define _POSIX_C_SOURCE 200809L
 
 #include <stdio.h> /* printf */
@@ -10,17 +18,17 @@
 
 typedef struct 
 {
-    long long start;       
-    long long end;        
-    long long partial_sum;
+    size_t start;       
+    size_t end;        
+    size_t partial_sum;
 
 } thread_data_t;
 
 static void *worker(void *arg)
 {
-    long long num = 0;
-    long long sum = 0;
-    long long i = 0;
+    size_t num = 0;
+    size_t sum = 0;
+    size_t i = 0;
     thread_data_t *data = (thread_data_t *)arg;
     data->partial_sum = 0;
 
@@ -57,14 +65,14 @@ int main(void)
     int i = 0;
     long ns_elapsed = 0;
     double elapsed = 0;
-    long long total_sum = 0;
+    size_t total_sum = 0;
     pthread_t threads[NTHREADS];
     thread_data_t thread_data[NTHREADS];
     struct timespec tstart;
     struct timespec tend;
 
-    long long number = 1000000LL;
-    long long range = number / NTHREADS;
+    size_t number = 1000000LL;
+    size_t range = number / NTHREADS;
 
     for (i = 0; i < NTHREADS; i++)
     {
@@ -99,7 +107,7 @@ int main(void)
     ns_elapsed = timespec_diff_ns(&tstart, &tend);
     elapsed = ns_elapsed / 1e9;
 
-    printf("Sum of divisors from 1 to %lld using %d threads = %lld\n", number, NTHREADS, total_sum);
+    printf("Sum of divisors from 1 to %ld using %d threads = %ld\n", number, NTHREADS, total_sum);
     printf("Time taken: %.6f seconds\n", elapsed);
 
     return 0;

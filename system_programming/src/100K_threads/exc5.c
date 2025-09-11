@@ -1,3 +1,11 @@
+/**************************************
+Exercise: milion threads
+Date: 11/09/2025
+Developer: Baruchi haimson
+Reviewer: Tamar
+Status: Approved
+**************************************/
+
 #define _POSIX_C_SOURCE 200809L
 
 #include <stdio.h> /* printf */
@@ -7,15 +15,15 @@
 
 typedef struct 
 {
-    long long start;
-    long long end;
-    long long partial_sum;
+    size_t start;
+    size_t end;
+    size_t partial_sum;
 } thread_data_t;
 
-static long sum_divisors(long long n) 
+static long sum_divisors(size_t n) 
 {
-    long long sum = 0;
-    long long i = 0;
+    size_t sum = 0;
+    size_t i = 0;
 
     for (i = 1; i * i <= n; i++) 
     {
@@ -33,7 +41,7 @@ static long sum_divisors(long long n)
 
 void* worker(void* arg) 
 {
-    long long num = 0;
+    size_t num = 0;
     thread_data_t* data = (thread_data_t*)arg;
     data->partial_sum = 0;
 
@@ -57,8 +65,8 @@ int main(void)
     double elapsed = 0;
     struct timespec tstart;
     struct timespec tend;
-    long long total_sum = 0;
-    long long number = 1000000LL; 
+    size_t total_sum = 0;
+    size_t number = 1000000LL; 
     int thread_options[] = {1, 3, 5, 8, 10, 12, 15};
     int n_options = sizeof(thread_options) / sizeof(thread_options[0]);
 
@@ -68,9 +76,11 @@ int main(void)
         pthread_t threads[NTHREADS];
         thread_data_t thread_data[NTHREADS];
 
-        long long range = number / NTHREADS;
+        size_t range = number / NTHREADS;
 
-        for (int i = 0; i < NTHREADS; i++) 
+        total_sum = 0;
+
+        for (i = 0; i < NTHREADS; i++) 
         {
             thread_data[i].start = i * range + 1;
             thread_data[i].end = (i == NTHREADS - 1) ? number : (i + 1) * range;
@@ -104,11 +114,11 @@ int main(void)
 
         if (NTHREADS == 1)
         {
-            printf("Single-threaded: Sum of divisors = %lld, Time = %.6f sec\n", total_sum, elapsed);
+            printf("Single-threaded: Sum of divisors = %ld, Time = %.6f sec\n", total_sum, elapsed);
         }
         else
         {
-            printf("%2d threads: Sum of divisors = %lld, Time = %.6f sec\n", NTHREADS, total_sum, elapsed);
+            printf("%2d threads: Sum of divisors = %ld, Time = %.6f sec\n", NTHREADS, total_sum, elapsed);
         }
     }
 
