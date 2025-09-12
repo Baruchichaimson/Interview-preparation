@@ -47,6 +47,15 @@ void undo_handler(void)
 /* -------------------- Main -------------------- */
 int main(int argc, char *argv[]) 
 {
+    char cmd;
+    int i = 0;
+    int sval = 0;
+    int args = 0;
+    int num = 0;
+    int undo = 0;
+    char line[256];
+    char undo_str[16] = {0};
+
     if (argc != 2) 
     {
         printf("add a semaphore name!\n");
@@ -57,14 +66,14 @@ int main(int argc, char *argv[])
 
     atexit(undo_handler);  
 
-    sem = sem_open(sem_name, O_CREAT, 0644, 0);
+    sem = sem_open(sem_name, O_CREAT | O_EXCL, 0644, 0);
     if (sem == SEM_FAILED) 
     {
         perror("sem_open");
         return 1;
     }
 
-    char line[256];
+    
     while (1) 
     {
         printf("semaphore by baruchi :) > ");
@@ -74,30 +83,33 @@ int main(int argc, char *argv[])
         if (!fgets(line, sizeof(line), stdin))
             break;
 
-        char cmd;
-        int num = 0;
-        char undo_str[16] = {0};
+        args = sscanf(line, "%c %d %s", &cmd, &num, undo_str);
 
-        int args = sscanf(line, "%c %d %s", &cmd, &num, undo_str);
-
-        int undo = (args == 3 && strcmp(undo_str, "undo") == 0);
+        undo = (args == 3 && strcmp(undo_str, "undo") == 0);
 
         if (cmd == 'X')
+        {
             break;
+        }
         else if (cmd == 'V')
         {
-            int sval;
             if (sem_getvalue(sem, &sval) == -1)
+            {
                 perror("sem_getvalue");
+            }
             else
+            {
                 printf("Semaphore value: %d\n", sval);
+            }
         }
         else if ((cmd == 'D' || cmd == 'I') && args >= 2)
         {
             if (cmd == 'D')
             {
-                for (int i = 0; i < num; i++)
+                for (i = 0; i < num; i++)
+                {
                     sem_wait(sem);
+                }
 
                 if (undo)
                 {
@@ -107,8 +119,10 @@ int main(int argc, char *argv[])
             }
             else if (cmd == 'I')
             {
-                for (int i = 0; i < num; i++)
+                for (i = 0; i < num; i++)
+                {
                     sem_post(sem);
+                }
 
                 if (undo)
                 {
