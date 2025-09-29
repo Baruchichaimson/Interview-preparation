@@ -1,3 +1,10 @@
+/**************************************
+Exercise: milion threads
+Date: 29/09/2025
+Developer: Baruchi haimson
+Reviewer: Tamar
+Status: Approved
+**************************************/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

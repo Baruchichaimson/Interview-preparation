@@ -6,8 +6,11 @@
 #include <semaphore.h>
 #include "sched.h"
 
-extern const char *SEM_NAME_START;
-extern const char *SEM_NAME_STOP;
+#define WD_SEM_START "/wd_start_sem"
+#define WD_SEM_STOP  "/wd_stop_sem"
+
+/*extern const char *SEM_NAME_START;
+extern const char *SEM_NAME_STOP;*/
 
 typedef struct wd_context
 {

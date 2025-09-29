@@ -16,6 +16,7 @@ int main(int argc, char *argv[])
     wd_context_t ctx;
     struct sigaction sa;
     sem_t *sem = NULL;
+    sem_t *stop_sem = NULL;
     sched_t *sched = NULL;
 
     unsigned int interval = argc > 1 ? (unsigned int)atoi(argv[1]) : 2;
@@ -50,16 +51,31 @@ int main(int argc, char *argv[])
     SchedAdd(sched, CheckTolerance, &ctx, interval, DummyCleanup, NULL);
     SchedAdd(sched, CheckStopFlag, &ctx, interval, DummyCleanup, NULL);
 
-    sem = sem_open(SEM_NAME, 0);
+    sem = sem_open(WD_SEM_START, 0);
     if (sem != SEM_FAILED) 
     { 
         sem_post(sem); 
         sem_close(sem); 
     }
 
+    stop_sem = sem_open(WD_SEM_STOP, 0);
+    if (stop_sem != SEM_FAILED)
+    {
+        ctx.sem_stop = stop_sem;
+    }
+    else
+    {
+        ctx.sem_stop = NULL; 
+    }
+
     printf("[watch_dog][pid %d] WD scheduler starting\n", getpid());
     SchedRun(sched);
     SchedDestroy(sched);
+
+    if (ctx.sem_stop)
+    {
+        sem_close(ctx.sem_stop);
+    }
 
     return 0;
 }

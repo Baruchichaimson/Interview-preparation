@@ -29,7 +29,10 @@ void WDInternalSetContext(wd_context_t *ctx)
 
 void WDSignalHandler(int sig)
 {
-    if (!g_ctx_ptr) return;
+    if (!g_ctx_ptr) 
+    {
+        return;
+    }
 
     if (sig == SIGUSR1)
     {
@@ -40,6 +43,11 @@ void WDSignalHandler(int sig)
     {
         atomic_store(&g_ctx_ptr->stop_flag, 1);
         printf("[signal][pid %d] SIGUSR2 received -> stop_flag set\n", getpid());
+
+        if (g_ctx_ptr->sem_stop)
+        {
+            sem_post(g_ctx_ptr->sem_stop);
+        }
     }
 }
 
@@ -238,6 +246,6 @@ void Revive(wd_context_t *ctx)
 
         execvp(wd_args[0], wd_args);
         perror("[Revive][child] execvp failed");
-        _exit(1);
+        _exit(0);
     }
 }

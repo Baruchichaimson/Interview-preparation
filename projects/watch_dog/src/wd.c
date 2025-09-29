@@ -6,6 +6,7 @@
 #include <semaphore.h>
 #include <fcntl.h> /* O_CREAT */
 #include <sys/stat.h> /* 0666 */
+#include <sys/wait.h>
 #include <sys/types.h>
 #include <string.h>
 #include "wd.h"
@@ -16,8 +17,8 @@ pthread_mutex_t g_revive_mutex = PTHREAD_MUTEX_INITIALIZER;
 sem_t *g_sem_start = NULL;
 sem_t *g_sem_stop  = NULL;
 
-const char *g_sem_start_name = "/wd_start_sem";
-const char *g_sem_stop_name  = "/wd_stop_sem";
+/*const char *g_sem_start_name = "/wd_start_sem";
+const char *g_sem_stop_name  = "/wd_stop_sem";*/
 
 static wd_context_t g_ctx;
 static pthread_t g_thread_id = 0;
@@ -80,11 +81,11 @@ wd_status_e WDStart(unsigned int interval, unsigned int tolerance, const char **
     }
     g_ctx.user_argv[argc] = NULL; 
 
-    sem_unlink(g_sem_start_name);
-    sem_unlink(g_sem_stop_name);
+    sem_unlink(WD_SEM_START);
+    sem_unlink(WD_SEM_STOP);
 
-    g_sem_start = sem_open(g_sem_start_name, O_CREAT, 0666, 0);
-    g_sem_stop  = sem_open(g_sem_stop_name,  O_CREAT, 0666, 0);
+    g_sem_start = sem_open(WD_SEM_START, O_CREAT, 0666, 0);
+    g_sem_stop  = sem_open(WD_SEM_STOP,  O_CREAT, 0666, 0);
 
     if (g_sem_start == SEM_FAILED || g_sem_stop == SEM_FAILED)
     {
@@ -136,6 +137,10 @@ wd_status_e WDStart(unsigned int interval, unsigned int tolerance, const char **
 
 wd_status_e WDStop(void)
 {
+    int i = 0;
+    int status = 0;
+    struct timespec ts;
+
     printf("[WDStop][pid %d] Stopping WD and user scheduler\n", getpid());
 
     setenv("WD_DO_NOT_REVIVE", "1", 1);
@@ -150,13 +155,11 @@ wd_status_e WDStop(void)
 
     atomic_store(&g_ctx.stop_flag, 1);
 
-    /*sem_wait(g_sem_stop);*/
-
     if (g_sem_stop && g_sem_stop != SEM_FAILED)
     {
-        struct timespec ts;
+        
         clock_gettime(CLOCK_REALTIME, &ts);
-        ts.tv_sec += 5; /* wait max 5 seconds */
+        ts.tv_sec += 5; 
 
         if (sem_timedwait(g_sem_stop, &ts) != 0)
         {
@@ -166,8 +169,7 @@ wd_status_e WDStop(void)
 
     if (g_ctx.user_sched)
     {
-        SchedDestroy(g_ctx.user_sched);
-        g_ctx.user_sched = NULL;
+        SchedStop(g_ctx.user_sched);
     }
 
     if (g_thread_id)
@@ -176,22 +178,28 @@ wd_status_e WDStop(void)
         g_thread_id = 0;
     }
 
+    if (g_ctx.user_sched)
+    {
+        SchedDestroy(g_ctx.user_sched);
+        g_ctx.user_sched = NULL;
+    }
+
     if (g_sem_start && g_sem_start != SEM_FAILED)
     {
         sem_close(g_sem_start);
-        sem_unlink(g_sem_start_name);
+        sem_unlink(WD_SEM_START);
         g_sem_start = NULL;
     }
     if (g_sem_stop && g_sem_stop != SEM_FAILED)
     {
         sem_close(g_sem_stop);
-        sem_unlink(g_sem_stop_name);
+        sem_unlink(WD_SEM_STOP);
         g_sem_stop = NULL;
     }
 
     if (g_ctx.user_argv)
     {
-        for (int i = 0; i < g_ctx.user_argc; ++i)
+        for (i = 0; i < g_ctx.user_argc; ++i)
         {
             free(g_ctx.user_argv[i]);
         }
@@ -201,11 +209,10 @@ wd_status_e WDStop(void)
 
     if (g_ctx.wd_pid > 0)
     {
-        int status = 0;
+        status = 0;
         pid_t ret = waitpid(g_ctx.wd_pid, &status, WNOHANG);
         if (ret == 0)
         {
-            /* still running, force kill */
             kill(g_ctx.wd_pid, SIGKILL);
             waitpid(g_ctx.wd_pid, &status, 0);
         }
