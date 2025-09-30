@@ -14,12 +14,6 @@
 
 #include "wd_internal.h"
 
-extern pthread_mutex_t g_revive_mutex;
-extern sem_t *g_sem_start;
-extern sem_t *g_sem_stop;
-extern const char *g_sem_start_name;
-extern const char *g_sem_stop_name;
-
 static wd_context_t *g_ctx_ptr = NULL;
 
 void WDInternalSetContext(wd_context_t *ctx)
@@ -163,6 +157,7 @@ void Revive(wd_context_t *ctx)
     char interval_str[16];
     char tol_str[16];
     char* wd_args[4];
+    char* user_args[2];
 
     if (!ctx)
     {
@@ -241,11 +236,13 @@ void Revive(wd_context_t *ctx)
         }
         printf("[Revive][pid %d] WD reviving User via execvp...\n", getpid());
 
-        wd_args[0] = "../bin/debug/user_prog", 
-        wd_args[1] = NULL;
+        user_args[0] = "../bin/debug/user_prog", 
+        user_args[1] = NULL;
 
-        execvp(wd_args[0], wd_args);
+        execvp(user_args[0], user_args);
         perror("[Revive][child] execvp failed");
         _exit(0);
     }
+    pthread_mutex_unlock(&g_revive_mutex);
+
 }

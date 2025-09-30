@@ -9,8 +9,7 @@
 #define WD_SEM_START "/wd_start_sem"
 #define WD_SEM_STOP  "/wd_stop_sem"
 
-/*extern const char *SEM_NAME_START;
-extern const char *SEM_NAME_STOP;*/
+extern pthread_mutex_t g_revive_mutex;
 
 typedef struct wd_context
 {

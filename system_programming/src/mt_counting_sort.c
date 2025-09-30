@@ -5,14 +5,14 @@ Developer: Baruchi haimson
 Reviewer: Tamar
 Status: Approved
 **************************************/
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
-#include <pthread.h>
+#include <stdio.h> /* printf */
+#include <stdlib.h> /* malloc */
+#include <string.h> /* memcpy */
+#include <time.h> /* clock_t */
+#include <pthread.h> /* pthread_create */
 
-#define ALPHABET_SIZE 256 
-#define MAX_THREADS 16
+#define ALPHABET_SIZE (256) 
+#define MAX_THREADS (16)
 
 typedef struct ThreadArgs
 {
@@ -179,7 +179,7 @@ int main(int argc, char **argv)
     end_time = clock();
 
     printf("=== Sorted Letters (A-Z, a-z) ===\n");
-    for (size_t i = 0; i < big_n; i++) 
+    for (i = 0; i < big_n; i++) 
     {
         if ((sorted[i] >= 'A' && sorted[i] <= 'Z'))
         {

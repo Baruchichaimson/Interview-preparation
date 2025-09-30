@@ -17,9 +17,6 @@ pthread_mutex_t g_revive_mutex = PTHREAD_MUTEX_INITIALIZER;
 sem_t *g_sem_start = NULL;
 sem_t *g_sem_stop  = NULL;
 
-/*const char *g_sem_start_name = "/wd_start_sem";
-const char *g_sem_stop_name  = "/wd_stop_sem";*/
-
 static wd_context_t g_ctx;
 static pthread_t g_thread_id = 0;
 

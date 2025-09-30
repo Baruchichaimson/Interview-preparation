@@ -5,10 +5,10 @@
 #include <semaphore.h>
 #include <pthread.h>
 #include <string.h>
+
 #include "wd_internal.h"
 #include "sched.h"
 
-#define SEM_NAME "/wd_sync_sem"
 static void DummyCleanup(void *param) { (void)param; }
 
 int main(int argc, char *argv[])
