@@ -1,0 +1,52 @@
+#
+alias removetilda='rm *~' 
+
+# ============================================================================
+# GCC/G++ COMPILER ALIASES
+# ============================================================================
+
+# C89/ANSI C compilation
+alias gc='gcc -ansi -pedantic-errors -Wall -Wextra -DNDEBUG -O3'  # Release
+alias gd='gcc -ansi -pedantic-errors -Wall -Wextra -g'            # Debug
+
+# C99 compilation
+alias gc9='gcc -std=c99 -pedantic-errors -Wall -Wextra -DNDEBUG -O3'  # Release
+alias gd9='gcc -std=c99 -pedantic-errors -Wall -Wextra -g'            # Debug
+
+# C++98 compilation
+alias gpc='g++ -std=c++98 -pedantic-errors -Wall -Wextra -DNDEBUG -O3'  # Release
+alias gpd='g++ -std=c++98 -pedantic-errors -Wall -Wextra -g'            # Debug
+
+# C++11 compilation
+alias gpc11='g++ -std=c++11 -pedantic-errors -Wall -Wextra -DNDEBUG -O3'  # Release
+alias gpd11='g++ -std=c++11 -pedantic-errors -Wall -Wextra -g'            # Debug
+
+# ============================================================================
+# DEBUGGING TOOLS
+# ============================================================================
+
+# Valgrind memory checker
+alias vlg='valgrind --leak-check=yes --track-origins=yes'
+
+# ============================================================================
+# GIT ALIASES
+# ============================================================================
+
+# Status and information
+alias gs='git status'
+alias gb='git branch'
+alias gr='git remote -v'
+
+# Staging and committing
+alias gaa='git add -A'          # Stage all changes
+alias gcm='git commit -m'       # Commit with message
+
+# Remote operations
+alias gpull='git pull'          # Pull from remote
+alias gpush='git push'          # Push to remote
+
+# Undo operations
+alias gundo='git reset --soft HEAD~1'     # Undo last commit, keep changes staged
+alias gunstage='git restore --staged'     # Unstage files
+alias greset='git reset HEAD'             # Alternative unstage
+

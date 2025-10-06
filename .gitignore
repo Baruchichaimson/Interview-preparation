@@ -10,10 +10,8 @@
 !*.mak
 !**/makefile
 !Makefile
+
 !make
-!bit_arr
-!stack
-!vector
-!sll
-!cbuff
+!.my_aliases
+
 

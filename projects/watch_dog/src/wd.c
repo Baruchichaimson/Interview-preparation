@@ -9,10 +9,9 @@
 #include <sys/wait.h>
 #include <sys/types.h>
 #include <string.h>
+
 #include "wd.h"
 #include "wd_internal.h"
-
-pthread_mutex_t g_revive_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 sem_t *g_sem_start = NULL;
 sem_t *g_sem_stop  = NULL;
@@ -37,7 +36,7 @@ static void *UserSchedThread(void *arg)
     SchedAdd(user_sched, CheckTolerance, ctx, ctx->interval, NoCleanup, NULL);
     SchedAdd(user_sched, CheckStopFlag, ctx, ctx->interval, NoCleanup, NULL);
 
-    SchedRun(user_sched);
+    SchedRun(ctx->user_sched);
 
     printf("[UserSchedThread][pid %d] User scheduler exiting\n", getpid());
     return NULL;

@@ -14,6 +14,7 @@
 
 #include "wd_internal.h"
 
+pthread_mutex_t g_revive_mutex = PTHREAD_MUTEX_INITIALIZER;
 static wd_context_t *g_ctx_ptr = NULL;
 
 void WDInternalSetContext(wd_context_t *ctx)
