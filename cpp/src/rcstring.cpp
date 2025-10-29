@@ -31,18 +31,16 @@ namespace ilrd
         ++m_rc->m_count;
     }
 
-    RCString& RCString::operator=(const RCString& other)
-    {
-        if (this != &other)
+    RCString& RCString::operator=(const RCString& other)  // RC2 = "aa"; 
+    {  
+        if (--m_rc->m_count == 0)
         {
-            if (--m_rc->m_count == 0)
-            {
-                operator delete(m_rc);
-            }
-
-            m_rc = other.m_rc;
-            ++m_rc->m_count;
+            operator delete(m_rc);
         }
+
+        m_rc = other.m_rc;
+        ++m_rc->m_count;
+        
         return (*this);
     }
 
@@ -69,8 +67,8 @@ namespace ilrd
         {
             throw std::out_of_range("RCString index out of range");
         }
-
-        if (m_rc->m_count > 1)
+        // i can also just do--- > *this = m_rc->m_str and operator = will call to implicit ctor
+        if (m_rc->m_coןunt > 0)
         {
             size_t len = Length();
             size_t total_size = offsetof(RCImp, m_str) + len + 1;

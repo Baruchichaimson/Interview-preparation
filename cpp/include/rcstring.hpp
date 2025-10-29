@@ -26,7 +26,7 @@ namespace ilrd
         RCString(const RCString& other);
         RCString& operator=(const RCString& other);
         ~RCString() noexcept;
-        inline char* ToCStr() const noexcept;
+        inline const char* ToCStr() const noexcept;
         inline size_t Length() const noexcept; 
         char operator[](size_t idx) const; 
         char& operator[](size_t idx);
@@ -46,7 +46,7 @@ namespace ilrd
     std::ostream& operator<<(std::ostream& os, const RCString& other);
     std::istream& operator>>(std::istream& is, RCString& other);	
 
-    char* RCString::ToCStr() const noexcept
+    const char* RCString::ToCStr() const noexcept
     {
         return m_rc->m_str;
     }
