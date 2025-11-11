@@ -8,7 +8,7 @@
 #define NUM_PRODUCERS 2
 #define NUM_CONSUMERS 2
 #define NUM_MESSAGES 10
-#define CB_CAPACITY (NUM_PRODUCERS * NUM_MESSAGES * sizeof(int))
+#define CB_CAPACITY (NUM_PRODUCERS * NUM_MESSAGES)
 
 struct cbuff* buff;
 pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
@@ -75,7 +75,7 @@ int main()
     pthread_t prod[NUM_PRODUCERS];
     pthread_t cons[NUM_CONSUMERS];
 
-    buff = CBuffCreate(CB_CAPACITY);
+    buff = CBuffCreate(CB_CAPACITY * sizeof(int));
     if (!buff) 
     {
         return 1;
