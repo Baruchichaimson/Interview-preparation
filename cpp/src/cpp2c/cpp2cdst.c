@@ -6,8 +6,8 @@
  Status:    
 ***************************/
 
-#include <stdio.h> /* */
-#include <stdlib.h> /* */
+#include <stdio.h> /* printf */
+#include <stdlib.h> /* malloc */
 
 #define TEMPLATE_MAX(T) \
     T Max_##T(T a, T b) \
