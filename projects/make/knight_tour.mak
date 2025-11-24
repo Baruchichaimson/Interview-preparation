@@ -38,11 +38,11 @@ $(DS_SRC_DIR)/lib%.so: $(DS_SRC_DIR)/%.c
 
 # Build Shared librarys in sched/src/ #
 $(RECURSIA_SRC_DIR)/lib%.so: $(RECURSIA_SRC_DIR)/%.c
-	$(CC) $(CFLAGS) $(INC_DIRS) -shared -o $@ $<
+	$(CC) -fPIC $(CFLAGS) $(INC_DIRS) -shared -o $@ $<
 
 # Build Test object file #
 $(TEST_DIR)/knight_tour_test.o: $(TEST_DIR)/knight_tour_test.c
-	$(CC) $(CFLAGS) $(INC_DIRS) -c -o $@ $<
+	$(CC) -fPIC $(CFLAGS) $(INC_DIRS) -c -o $@ $<
 
 # build directory before linking (order-only prerequisite) #
 $(TARGET): | $(BUILD_DIR)
