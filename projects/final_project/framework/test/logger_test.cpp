@@ -9,7 +9,6 @@ g++ -std=gnu++11 -pthread -Iinclude src/logger.cpp test/logger_test.cpp \
 LD_LIBRARY_PATH=. ./logger_test
 
 */
-
 #include "logger.hpp"
 
 int main()
@@ -18,6 +17,9 @@ int main()
 
     logger.SetLevel(ilrd::Logger::INFO);
     logger.Log("Program started", ilrd::Logger::INFO,__FILE__, __LINE__);
+
+    logger.SetLevel(ilrd::Logger::INFO);
+    LOG("MACRO", logger.INFO);
 
     logger.SetLevel(ilrd::Logger::DEBUG);
     logger.Log("baruchi", ilrd::Logger::ERROR,__FILE__, __LINE__);

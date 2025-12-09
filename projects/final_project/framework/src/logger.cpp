@@ -1,10 +1,10 @@
-#include "logger.hpp"
-
 #include <chrono>
 #include <iomanip>
 #include <sstream>
 #include <ctime>
 #include <utility>
+
+#include "logger.hpp"
 
 namespace ilrd
 {
@@ -83,7 +83,7 @@ Logger::~Logger()
     LogArgs sentinel;
     sentinel.msg = std::string();      
     sentinel.level = Logger::DEBUG;
-    sentinel.file_name = std::string("<<SENTINEL>>");
+    sentinel.file_name = std::string("The logger is close!!");
     sentinel.line = 0;
 
     m_queue.push(std::move(sentinel));
@@ -122,20 +122,10 @@ void Logger::Log(const std::string& msg, LogLevel level, std::string file_name, 
 
 ssize_t Logger::WriteToFile()
 {
-    while (true)
+    while (m_is_alive.load(std::memory_order_acquire) || !m_queue.empty())
     {
         LogArgs args;
         m_queue.pop(&args); 
-
-        if (!m_is_alive.load(std::memory_order_acquire) && args.file_name == "<<SENTINEL>>")
-        {
-            break;
-        }
-
-        if (args.msg.empty())
-        {
-            continue;
-        }
 
         std::string ts = GetTimestamp();
         m_file << ts << " [" << LogLevelToString(args.level) << "] "
