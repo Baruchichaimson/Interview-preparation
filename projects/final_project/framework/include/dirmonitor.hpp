@@ -38,7 +38,7 @@ private:
     std::thread m_listener;
     std::atomic<bool> m_is_running;
     char m_buffer[BUFFER_SIZE];
-    std::string m_dir_path;
+    const std::string m_dir_path;
     int m_inotify_fd;
     int m_watch_descriptor;
 };

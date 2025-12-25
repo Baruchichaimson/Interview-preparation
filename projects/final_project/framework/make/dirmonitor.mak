@@ -21,6 +21,6 @@ run: $(TARGET)
 	./$(TARGET)
 
 clean:
-	rm -f $(TARGET)
+	rm $(TARGET)
 
 .PHONY: all run clean

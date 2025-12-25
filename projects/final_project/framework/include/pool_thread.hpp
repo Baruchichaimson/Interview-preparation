@@ -15,6 +15,7 @@ Status:	waiting
 #include <mutex>              // m_run_mutex
 #include <condition_variable> // condition_variable
 
+#include "pq.hpp"
 #include "waitable_queue.hpp" // WaitableQueue
 
 namespace ilrd
@@ -54,12 +55,12 @@ private:
         }
     };
 
-    using TaskQueue = std::priority_queue<TaskEntry, std::vector<TaskEntry>, TaskComparator>;
+    using TaskQueue = PQ<TaskEntry, std::vector<TaskEntry>, TaskComparator>;
     using TaskWaitableQueue = WaitableQueue<TaskEntry, TaskQueue>;
 
 public:
 
-    explicit ThreadPool(std::size_t num_threads);
+    explicit ThreadPool(std::size_t num_threads = std::thread::hardware_concurrency());
     ~ThreadPool() noexcept;
 
     void Add(TaskPtr task, priority priority = MEDIUM);

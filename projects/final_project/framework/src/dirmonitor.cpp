@@ -16,8 +16,8 @@ Status:
 namespace ilrd
 {
 
-DirMonitor::DirMonitor(const std::string& dir) : m_dir_path(std::move(dir)), m_dispatcher(Dispatcher<const std::string&>()),
-        m_buffer{0}, m_inotify_fd(-1), m_watch_descriptor(-1), m_is_running(false)
+DirMonitor::DirMonitor(const std::string& dir) : m_dispatcher(Dispatcher<const std::string&>()), m_is_running(false),
+        m_buffer{0},m_dir_path(std::move(dir)), m_inotify_fd(-1), m_watch_descriptor(-1)
 {
     LOG_DEBUG("DirMonitor ctor entered");
 
@@ -67,12 +67,16 @@ void DirMonitor::Run()
 
 void DirMonitor::Register(BaseCallback<const std::string&>* cb)
 {
+    LOG_DEBUG("DirMonitor::Register entered");
     m_dispatcher.Subscribe(cb);
+    LOG_DEBUG("DirMonitor::Register exit");
 }
 
 void DirMonitor::Unregister(BaseCallback<const std::string&>* cb)
 {
+    LOG_DEBUG("DirMonitor::Unregister entered");
     m_dispatcher.Unsubscribe(cb);
+    LOG_DEBUG("DirMonitor::Unregister exit");
 }
 
 void DirMonitor::ListeningLoop()
@@ -99,7 +103,7 @@ void DirMonitor::ListeningLoop()
 
         std::size_t i = 0;
 
-        while (i < length)
+        while ((ssize_t)i < length)
         {
             inotify_event* event = reinterpret_cast<inotify_event*>(&m_buffer[i]);
 

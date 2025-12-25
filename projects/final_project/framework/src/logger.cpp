@@ -74,18 +74,21 @@ void Logger::Log(const std::string& msg, LogLevel level, std::string file_name, 
 
 ssize_t Logger::WriteToFile()
 {
+    std::size_t lines_written = 0;
+
     while (m_is_alive.load(std::memory_order_acquire) || !m_queue.empty())
     {
         LogArgs args;
-        m_queue.pop(&args); 
+        m_queue.pop(&args);
 
         std::string ts = GetTimestamp();
         m_file << ts << " [" << LogLevelToString(args.level) << "] "
                << args.file_name << ":" << args.line << " " << args.msg << '\n';
         m_file.flush();
+        ++lines_written;
     }
 
-    return 0;
+    return lines_written;
 }
 
 static const char* LogLevelToString(Logger::LogLevel level)

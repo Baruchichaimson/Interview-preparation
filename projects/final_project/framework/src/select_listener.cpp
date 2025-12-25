@@ -10,12 +10,15 @@ Status:
 #include <algorithm> // std::max
 
 #include "select_listener.hpp"
+#include "logger.hpp"
 
 namespace ilrd
 {
 
 std::vector<Reactor::fd_pair> SelectListener::Listen(const std::vector<Reactor::fd_pair>& set)
 {
+    LOG_DEBUG("SelectListener::Listen entered");
+
     fd_set readfds;
     fd_set writefds;
     FD_ZERO(&readfds);
@@ -54,6 +57,8 @@ std::vector<Reactor::fd_pair> SelectListener::Listen(const std::vector<Reactor::
             ready.push_back(pair);
         }
     }
+
+    LOG_DEBUG("SelectListener::Listen exit");
 
     return ready;
 }
