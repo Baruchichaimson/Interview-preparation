@@ -54,7 +54,8 @@ const emailLayout = (content) => `
 export const sendVerificationEmail = async (email, token) => {
   console.log('📨 Verification token:', token);
   
-  const verificationLink = `${process.env.APP_BASE_URL}/verify?token=${token}`;
+  const backendBaseUrl = process.env.APP_BASE_URL;
+  const verificationLink = `${backendBaseUrl}/api/v1/auth/verify?token=${token}`;
 
   const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -115,7 +116,9 @@ export const sendVerificationEmail = async (email, token) => {
 export const sendPasswordResetEmail = async (email, token) => {
   console.log('🔐 Reset token:', token);
 
-  const resetLink = `${process.env.APP_BASE_URL}/reset-password?token=${token}`;
+  const frontendBaseUrl =
+    process.env.FRONTEND_BASE_URL || process.env.APP_BASE_URL;
+  const resetLink = `${frontendBaseUrl}/reset-password?token=${token}`;
 
   const transporter = nodemailer.createTransport({
     service: 'gmail',

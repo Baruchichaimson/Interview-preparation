@@ -9,5 +9,6 @@ router.get('/verify', controller.verify);
 router.post('/logout', controller.logout);
 router.post('/forgot-password', controller.forgotPassword);
 router.post('/reset-password', controller.resetPassword);
+router.get('/verify-status', controller.verifyStatus);
 
 export default router;

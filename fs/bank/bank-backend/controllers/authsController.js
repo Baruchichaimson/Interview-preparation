@@ -60,12 +60,40 @@ const signup = async (req, res) => {
 };
 
 /* ================= VERIFY ================= */
+const renderVerifyHtml = (res, statusCode, title, message) => {
+  res.status(statusCode).send(`
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>${title}</title>
+      </head>
+      <body style="font-family: Arial, sans-serif; background:#f5f7fa; padding:40px;">
+        <div style="max-width:520px;margin:0 auto;background:#fff;border-radius:12px;padding:28px;box-shadow:0 10px 30px rgba(0,0,0,0.08);">
+          <h2 style="margin:0 0 12px 0;color:#0c4a6e;">${title}</h2>
+          <p style="margin:0;color:#334155;">${message}</p>
+          <p style="margin:18px 0 0;color:#64748b;font-size:14px;">
+            You can return to the registration tab.
+          </p>
+        </div>
+      </body>
+    </html>
+  `);
+};
+
 const verify = async (req, res) => {
+  const frontendBaseUrl =
+    process.env.FRONTEND_BASE_URL || process.env.APP_BASE_URL;
   try {
     const { token: rawToken } = req.query;
     const token = Array.isArray(rawToken) ? rawToken[0] : rawToken;
+    const wantsHtml = req.headers.accept?.includes('text/html');
 
     if (!token || typeof token !== 'string' || !token.trim()) {
+      if (wantsHtml) {
+        return renderVerifyHtml(res, 400, 'Verification failed', 'Token is required.');
+      }
       return res.status(400).json({ message: 'Token is required' });
     }
 
@@ -73,14 +101,23 @@ const verify = async (req, res) => {
 
     const user = await usersModel.findUserByVerificationToken(normalizedToken);
     if (!user) {
+      if (wantsHtml) {
+        return renderVerifyHtml(res, 404, 'Verification failed', 'Invalid token.');
+      }
       return res.status(404).json({ message: 'Invalid token' });
     }
 
     if (user.isVerified) {
+      if (wantsHtml) {
+        return renderVerifyHtml(res, 200, 'Already verified', 'This account is already verified.');
+      }
       return res.status(400).json({ message: 'User already verified' });
     }
 
     if (Date.now() > user.verificationExpires) {
+      if (wantsHtml) {
+        return renderVerifyHtml(res, 400, 'Verification failed', 'Token expired.');
+      }
       return res.status(400).json({ message: 'Token expired' });
     }
 
@@ -104,6 +141,15 @@ const verify = async (req, res) => {
       { expiresIn: '1h' }
     );
 
+    if (wantsHtml) {
+      return renderVerifyHtml(
+        res,
+        200,
+        'Verified successfully',
+        'Your account has been verified.'
+      );
+    }
+
     return res.status(200).json({
       message: 'Account verified successfully',
       accessToken
@@ -111,6 +157,9 @@ const verify = async (req, res) => {
 
   } catch (err) {
     console.error(err);
+    if (req.headers.accept?.includes('text/html')) {
+      return renderVerifyHtml(res, 500, 'Verification failed', 'Server error.');
+    }
     return res.status(500).json({ message: 'Server error' });
   }
 };
@@ -232,11 +281,35 @@ const resetPassword = async (req, res) => {
   }
 };
 
+/* ================= VERIFY STATUS ================= */
+const verifyStatus = async (req, res) => {
+  try {
+    const { email } = req.query;
+
+    if (!email || typeof email !== 'string') {
+      return res.status(400).json({ message: 'Email is required' });
+    }
+
+    const user = await usersModel.findUserByEmail(email.trim());
+    if (!user) {
+      return res.status(404).json({ message: 'User not registered' });
+    }
+
+    return res.status(200).json({
+      isVerified: Boolean(user.isVerified)
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Server error' });
+  }
+};
+
 export default {
   signup,
   verify,
   login,
   logout,
   forgotPassword,
-  resetPassword
+  resetPassword,
+  verifyStatus
 };
