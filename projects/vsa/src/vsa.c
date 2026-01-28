@@ -1,3 +1,11 @@
+/**********
+ Exercise:	Variable size allocation
+ Date:	29/07/25
+ Developer:  
+ Reviewer:   
+ Status: Approved
+ **********/
+
 #include <assert.h> /* assert */
 
 #include "vsa.h" /* API vsa */
