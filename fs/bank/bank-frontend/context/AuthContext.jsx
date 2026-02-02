@@ -29,7 +29,8 @@ export function AuthProvider({ children }) {
     setTransactions([]);
     setLoading(false);
 
-    if (inactivityTimerRef.current) {
+    if (inactivityTimerRef.current) 
+    {
       clearTimeout(inactivityTimerRef.current);
       inactivityTimerRef.current = null;
     }
